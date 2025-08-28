@@ -2,41 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* IPLR Academic Magazine Design System 
+Elegant, minimalist academic aesthetic with sophisticated typography
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
+    /* Core palette - Clean academic blacks, whites, grays */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --foreground: 0 0% 8%;
+    
+    /* Surface colors */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 0 0% 8%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
+    --popover-foreground: 0 0% 8%;
+    
+    /* Brand colors - Sophisticated dark tones */
+    --primary: 0 0% 8%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 8%;
+    
+    /* Muted tones for subtle elements */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    
+    --accent: 0 0% 4%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    /* Borders and inputs - Very subtle */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 8%;
+    
+    --radius: 0.25rem;
+    
+    /* Custom academic design tokens */
+    --academic-gray: 0 0% 85%;
+    --academic-light: 0 0% 98%;
+    --academic-medium: 0 0% 25%;
+    --academic-dark: 0 0% 8%;
+    
+    /* Subtle shadows and effects */
+    --shadow-subtle: 0 0% 0% / 0.04;
+    --shadow-medium: 0 0% 0% / 0.08;
+    --shadow-strong: 0 0% 0% / 0.12;
+    
+    /* Transitions */
+    --transition-smooth: all 0.2s ease-out;
+    --transition-slow: all 0.3s ease-out;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +121,41 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Typography System */
+@layer utilities {
+  .font-academic {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-body {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Component Styles */
+@layer components {
+  .academic-card {
+    @apply bg-card rounded-sm border border-border shadow-[0_1px_3px_hsl(var(--shadow-subtle))] 
+           hover:shadow-[0_4px_12px_hsl(var(--shadow-medium))] transition-shadow duration-300;
+  }
+  
+  .academic-title {
+    @apply font-academic font-semibold text-foreground leading-tight;
+  }
+  
+  .academic-subtitle {
+    @apply font-body font-medium text-muted-foreground tracking-wide uppercase text-sm;
+  }
+  
+  .academic-text {
+    @apply font-body text-foreground/80 leading-relaxed;
+  }
+  
+  .smooth-hover {
+    @apply transition-all duration-200 ease-out hover:translate-y-[-2px];
   }
 }
