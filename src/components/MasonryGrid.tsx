@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Play, FileText, BookOpen, Clock, User, ExternalLink, Bitcoin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import article1 from "@/assets/article-1.jpg";
 import article2 from "@/assets/article-2.jpg";
@@ -211,83 +211,165 @@ const MasonryGrid = () => {
         </div>
 
         {/* Masonry Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-min">
-          {filteredItems.map((item) => (
-            <Card 
-              key={item.id} 
-              className={`academic-card smooth-hover group overflow-hidden relative ${getSizeClasses(item.size)}`}
-            >
-              {/* Image */}
-              <div className="relative h-full overflow-hidden">
-                <img 
-                  src={item.thumbnail}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                
-                {/* Content Overlay */}
-                <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
-                  {/* Category Badge */}
-                  <div className="mb-3">
-                    <Badge className="bg-white/20 text-white border-white/30 font-body text-xs backdrop-blur-sm">
-                      <span className="flex items-center gap-1">
-                        {getIcon(item.type)}
-                        {item.category}
-                      </span>
-                    </Badge>
+        <div id="articles" className="scroll-mt-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-min">
+            {filteredItems.map((item) => (
+              <Card 
+                key={item.id} 
+                className={`academic-card smooth-hover group overflow-hidden relative ${getSizeClasses(item.size)}`}
+              >
+                {/* Image */}
+                <div className="relative h-full overflow-hidden">
+                  <img 
+                    src={item.thumbnail}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  
+                  {/* Content Overlay */}
+                  <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                    {/* Category Badge */}
+                    <div className="mb-3">
+                      <Badge className="bg-white/20 text-white border-white/30 font-body text-xs backdrop-blur-sm">
+                        <span className="flex items-center gap-1">
+                          {getIcon(item.type)}
+                          {item.category}
+                        </span>
+                      </Badge>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="academic-title text-lg md:text-xl mb-2 group-hover:text-white/90 transition-colors duration-300">
+                      {item.title}
+                    </h3>
+
+                    {/* Description - only show on larger cards */}
+                    {(item.size === "featured" || item.size === "large") && (
+                      <p className="font-body text-sm text-white/80 mb-3 line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+
+                    {/* Price - Magazine style */}
+                    {item.price && (
+                      <div className="mb-3">
+                        <span className="font-academic text-lg font-semibold text-white">
+                          {item.price}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Meta Info */}
+                    <div className="flex items-center justify-between text-xs font-body text-white/70">
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <User className="h-3 w-3" />
+                          {item.author.split(' ')[0]}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {item.readTime}
+                        </span>
+                      </div>
+                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="academic-title text-lg md:text-xl mb-2 group-hover:text-white/90 transition-colors duration-300">
-                    {item.title}
-                  </h3>
-
-                  {/* Description - only show on larger cards */}
-                  {(item.size === "featured" || item.size === "large") && (
-                    <p className="font-body text-sm text-white/80 mb-3 line-clamp-2">
-                      {item.description}
-                    </p>
+                  {/* Featured Badge */}
+                  {item.featured && (
+                    <div className="absolute top-4 right-4">
+                      <Badge className="bg-accent text-accent-foreground font-body text-xs">
+                        FEATURED
+                      </Badge>
+                    </div>
                   )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
 
-                  {/* Price - Magazine style */}
-                  {item.price && (
+        {/* Research Section */}
+        <div id="research" className="scroll-mt-20 pt-16">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl font-academic font-bold text-foreground mb-4">Research Publications</h3>
+            <p className="font-body text-muted-foreground">Our latest peer-reviewed research and academic publications</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.filter(item => item.type === 'research').map((item) => (
+              <Card 
+                key={`research-${item.id}`} 
+                className="academic-card smooth-hover group overflow-hidden relative h-[350px]"
+              >
+                <div className="relative h-full overflow-hidden">
+                  <img 
+                    src={item.thumbnail}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
                     <div className="mb-3">
-                      <span className="font-academic text-lg font-semibold text-white">
-                        {item.price}
-                      </span>
+                      <Badge className="bg-green-500/20 text-green-200 border-green-300/30 font-body text-xs backdrop-blur-sm">
+                        Research
+                      </Badge>
                     </div>
-                  )}
-
-                  {/* Meta Info */}
-                  <div className="flex items-center justify-between text-xs font-body text-white/70">
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <User className="h-3 w-3" />
-                        {item.author.split(' ')[0]}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {item.readTime}
-                      </span>
+                    <h4 className="academic-title text-lg mb-2">{item.title}</h4>
+                    <p className="font-body text-sm text-white/80 mb-3 line-clamp-2">{item.description}</p>
+                    <div className="flex items-center justify-between text-xs font-body text-white/70">
+                      <span>{item.author}</span>
+                      <span>{item.readTime}</span>
                     </div>
-                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 </div>
+              </Card>
+            ))}
+          </div>
+        </div>
 
-                {/* Featured Badge */}
-                {item.featured && (
-                  <div className="absolute top-4 right-4">
-                    <Badge className="bg-accent text-accent-foreground font-body text-xs">
-                      FEATURED
-                    </Badge>
+        {/* Videos Section */}
+        <div id="videos" className="scroll-mt-20 pt-16">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl font-academic font-bold text-foreground mb-4">Educational Videos</h3>
+            <p className="font-body text-muted-foreground">Watch our latest educational content and presentations</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.filter(item => item.type === 'video').map((item) => (
+              <Card 
+                key={`video-${item.id}`} 
+                className="academic-card smooth-hover group overflow-hidden relative h-[350px]"
+              >
+                <div className="relative h-full overflow-hidden">
+                  <img 
+                    src={item.thumbnail}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 group-hover:bg-white/30 transition-all duration-300">
+                      <Play className="h-6 w-6 text-white ml-1" />
+                    </div>
                   </div>
-                )}
-              </div>
-            </Card>
-          ))}
+                  <div className="absolute inset-0 p-6 flex flex-col justify-end text-white">
+                    <div className="mb-3">
+                      <Badge className="bg-red-500/20 text-red-200 border-red-300/30 font-body text-xs backdrop-blur-sm">
+                        Video
+                      </Badge>
+                    </div>
+                    <h4 className="academic-title text-lg mb-2">{item.title}</h4>
+                    <div className="flex items-center justify-between text-xs font-body text-white/70">
+                      <span>{item.author}</span>
+                      <span>{item.readTime}</span>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Load More - Magazine Style */}
