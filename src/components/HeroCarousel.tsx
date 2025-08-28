@@ -67,20 +67,20 @@ const HeroCarousel = () => {
             />
             <div className="absolute inset-0 bg-black/30" />
             
-            {/* Content Overlay */}
-            <div className="relative h-full flex items-center justify-center text-center px-6">
-              <div className="max-w-4xl mx-auto text-white">
-                <p className="academic-subtitle text-white/80 mb-4 tracking-wider">
-                  {slide.subtitle}
-                </p>
-                <h1 className="text-4xl md:text-6xl font-academic font-bold mb-6 leading-tight">
-                  {slide.title}
-                </h1>
-                <p className="text-lg md:text-xl font-body font-light leading-relaxed max-w-2xl mx-auto opacity-90">
-                  {slide.description}
-                </p>
-              </div>
-            </div>
+        {/* Hero Content - More refined overlay */}
+        <div className="relative h-full flex items-center justify-center text-center px-6">
+          <div className="max-w-5xl mx-auto text-white">
+            <p className="text-xs font-body text-white/90 mb-4 uppercase tracking-[0.3em] border-b border-white/20 pb-2 inline-block">
+              {slide.subtitle}
+            </p>
+            <h1 className="text-4xl md:text-7xl font-academic font-bold mb-8 leading-[0.9] tracking-tight">
+              {slide.title}
+            </h1>
+            <p className="text-base md:text-lg font-body font-light leading-relaxed max-w-3xl mx-auto opacity-90">
+              {slide.description}
+            </p>
+          </div>
+        </div>
           </div>
         ))}
       </div>

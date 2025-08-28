@@ -139,8 +139,8 @@ All colors MUST be HSL.
 /* Component Styles */
 @layer components {
   .academic-card {
-    @apply bg-card rounded-sm border border-border shadow-[0_1px_3px_hsl(var(--shadow-subtle))] 
-           hover:shadow-[0_4px_12px_hsl(var(--shadow-medium))] transition-shadow duration-300;
+    @apply bg-card rounded-none border border-border shadow-[0_1px_3px_hsl(var(--shadow-subtle))] 
+           hover:shadow-[0_8px_25px_hsl(var(--shadow-medium))] transition-all duration-500;
   }
   
   .academic-title {
@@ -156,6 +156,28 @@ All colors MUST be HSL.
   }
   
   .smooth-hover {
-    @apply transition-all duration-200 ease-out hover:translate-y-[-2px];
+    @apply transition-all duration-500 ease-out hover:translate-y-[-2px];
+  }
+
+  /* Magazine-style masonry grid utilities */
+  .masonry-item {
+    @apply break-inside-avoid mb-6;
+  }
+
+  /* Text truncation utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }

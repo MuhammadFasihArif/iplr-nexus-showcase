@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
-import ContentGrid from "@/components/ContentGrid";
+import MasonryGrid from "@/components/MasonryGrid";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -9,7 +9,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroCarousel />
-        <ContentGrid />
+        <MasonryGrid />
       </main>
       <Footer />
     </div>
