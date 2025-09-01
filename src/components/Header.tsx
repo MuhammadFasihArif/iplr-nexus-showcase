@@ -56,11 +56,11 @@ const Header = () => {
       </div>
 
       {/* Navigation Tabs - Paper Magazine Style */}
-      <div className="border-t border-border bg-background">
-        <div className="w-full px-6">
+      <div className="border-t-2 border-border bg-background shadow-sm">
+        <div className="w-full px-8">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-center">
-            <nav className="flex items-center justify-center flex-1">
+            <nav className="flex items-center justify-center flex-1 max-w-5xl mx-auto">
               {navItems.map((item) => (
                 <a
                   key={item.name}
@@ -71,9 +71,10 @@ const Header = () => {
                       behavior: 'smooth'
                     });
                   }}
-                  className="px-8 py-4 text-xs font-body font-medium text-foreground uppercase tracking-[0.1em] hover:bg-muted/30 transition-all duration-200 border-b-2 border-transparent hover:border-foreground"
+                  className="px-12 py-6 text-sm font-body font-semibold text-foreground uppercase tracking-[0.15em] hover:bg-muted/30 hover:text-foreground/80 transition-all duration-300 border-b-3 border-transparent hover:border-foreground relative group"
                 >
                   {item.name}
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                 </a>
               ))}
             </nav>
