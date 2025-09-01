@@ -24,7 +24,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo - Newspaper Style */}
           <div className="text-center flex-1">
-            <h1 className="text-5xl md:text-6xl font-academic font-bold text-foreground tracking-wide mb-2">
+            <h1 className="text-5xl md:text-6xl font-academic font-bold tracking-wide mb-2" style={{ color: 'hsl(var(--logo-teal))' }}>
               IPLR
             </h1>
             <p className="text-xs font-body text-muted-foreground uppercase tracking-[0.2em] border-t border-b border-border py-1">
