@@ -57,22 +57,24 @@ const Header = () => {
 
       {/* Navigation Tabs - Paper Magazine Style */}
       <div className="border-t border-border bg-background">
-        <div className="container mx-auto px-6">
+        <div className="w-full px-6">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-center">
-            <nav className="flex items-center space-x-0">
-              {navItems.map((item, index) => (
-                <div key={item.name} className="flex items-center">
-                  <a
-                    href={item.href}
-                    className="px-8 py-4 text-xs font-body font-medium text-foreground uppercase tracking-[0.1em] hover:bg-muted/30 transition-all duration-200 border-b-2 border-transparent hover:border-foreground"
-                  >
-                    {item.name}
-                  </a>
-                  {index < navItems.length - 1 && (
-                    <Separator orientation="vertical" className="h-6 bg-border" />
-                  )}
-                </div>
+            <nav className="flex items-center justify-center flex-1">
+              {navItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.querySelector(item.href)?.scrollIntoView({
+                      behavior: 'smooth'
+                    });
+                  }}
+                  className="px-8 py-4 text-xs font-body font-medium text-foreground uppercase tracking-[0.1em] hover:bg-muted/30 transition-all duration-200 border-b-2 border-transparent hover:border-foreground"
+                >
+                  {item.name}
+                </a>
               ))}
             </nav>
           </div>

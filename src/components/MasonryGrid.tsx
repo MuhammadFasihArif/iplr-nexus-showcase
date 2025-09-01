@@ -184,39 +184,35 @@ const MasonryGrid = () => {
       <div className="container mx-auto max-w-7xl">
         {/* Magazine-style filter tabs */}
         <div className="flex justify-center mb-12 border-b border-border">
-          <div className="flex items-center space-x-0">
+          <div className="flex items-center">
             {[
               { key: "all" as const, label: "TOUS" },
               { key: "articles" as const, label: "ART" },
               { key: "research" as const, label: "RECHERCHE" },
               { key: "videos" as const, label: "VIDÉOS" }
-            ].map((filter, index) => (
-              <div key={filter.key} className="flex items-center">
-                <button
-                  onClick={() => setActiveFilter(filter.key)}
-                  className={`px-6 py-3 text-xs font-body font-medium uppercase tracking-[0.1em] transition-all duration-200 border-b-2 ${
-                    activeFilter === filter.key
-                      ? "border-foreground text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {filter.label}
-                </button>
-                {index < 3 && (
-                  <div className="w-px h-6 bg-border mx-2" />
-                )}
-              </div>
+            ].map((filter) => (
+              <button
+                key={filter.key}
+                onClick={() => setActiveFilter(filter.key)}
+                className={`px-8 py-3 text-xs font-body font-medium uppercase tracking-[0.1em] transition-all duration-200 border-b-2 ${
+                  activeFilter === filter.key
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {filter.label}
+              </button>
             ))}
           </div>
         </div>
 
         {/* Masonry Grid Layout */}
         <div id="articles" className="scroll-mt-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-rows-min">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 auto-rows-min">
             {filteredItems.map((item) => (
               <Card 
                 key={item.id} 
-                className={`academic-card smooth-hover group overflow-hidden relative ${getSizeClasses(item.size)}`}
+                className={`academic-card smooth-hover group overflow-hidden relative border border-border/50 shadow-sm ${getSizeClasses(item.size)}`}
               >
                 {/* Image */}
                 <div className="relative h-full overflow-hidden">
@@ -298,11 +294,11 @@ const MasonryGrid = () => {
             <h3 className="text-2xl font-academic font-bold text-foreground mb-4">Research Publications</h3>
             <p className="font-body text-muted-foreground">Our latest peer-reviewed research and academic publications</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredItems.filter(item => item.type === 'research').map((item) => (
               <Card 
                 key={`research-${item.id}`} 
-                className="academic-card smooth-hover group overflow-hidden relative h-[350px]"
+                className="academic-card smooth-hover group overflow-hidden relative h-[350px] border border-border/50 shadow-sm"
               >
                 <div className="relative h-full overflow-hidden">
                   <img 
@@ -336,11 +332,11 @@ const MasonryGrid = () => {
             <h3 className="text-2xl font-academic font-bold text-foreground mb-4">Educational Videos</h3>
             <p className="font-body text-muted-foreground">Watch our latest educational content and presentations</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredItems.filter(item => item.type === 'video').map((item) => (
               <Card 
                 key={`video-${item.id}`} 
-                className="academic-card smooth-hover group overflow-hidden relative h-[350px]"
+                className="academic-card smooth-hover group overflow-hidden relative h-[350px] border border-border/50 shadow-sm"
               >
                 <div className="relative h-full overflow-hidden">
                   <img 
