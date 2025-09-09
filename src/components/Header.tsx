@@ -32,6 +32,16 @@ const Header = () => {
             </p>
           </div>
 
+          {/* Admin Login Link */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.location.href = '/admin/login'}
+            className="p-2 absolute right-16 top-6 text-xs"
+          >
+            Admin
+          </Button>
+
           {/* Search Toggle */}
           <Button
             variant="ghost"

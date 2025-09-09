@@ -1,7 +1,10 @@
+import { useState, useEffect } from "react";
 import { Calendar, User, Clock, BookOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 interface Article {
   id: string;
@@ -15,6 +18,45 @@ interface Article {
 }
 
 const ArticleDisplay = () => {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchArticles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('published', true)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Transform database articles to match the interface
+      const transformedArticles: Article[] = (data || []).map(article => ({
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        author: article.author,
+        date: format(new Date(article.created_at), 'MMMM dd, yyyy'),
+        readTime: `${Math.ceil(article.content.length / 200)} min read`,
+        category: article.category,
+        featured: article.featured,
+      }));
+
+      setArticles(transformedArticles);
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+      // Fallback to dummy data if there's an error
+      setArticles(dummyArticles);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
   const dummyArticles: Article[] = [
     {
       id: "1",
@@ -111,8 +153,26 @@ const ArticleDisplay = () => {
           </p>
         </div>
 
-        <div className="space-y-12">
-          {dummyArticles.map((article) => (
+        {isLoading ? (
+          <div className="space-y-8">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="p-8 border border-border/50 animate-pulse">
+                <div className="space-y-4">
+                  <div className="h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-6 bg-muted rounded w-3/4"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 bg-muted rounded"></div>
+                    <div className="h-4 bg-muted rounded w-5/6"></div>
+                    <div className="h-4 bg-muted rounded w-4/5"></div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {articles.map((article) => (
             <Card 
               key={article.id} 
               className="p-8 border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300 bg-card"
@@ -185,8 +245,9 @@ const ArticleDisplay = () => {
                 </Button>
               </div>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Load More Articles */}
         <div className="text-center mt-12">
