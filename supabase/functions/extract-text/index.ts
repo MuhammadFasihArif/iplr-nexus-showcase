@@ -60,28 +60,46 @@ serve(async (req) => {
         // Convert to string and look for text patterns
         const textContent = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array);
         
-        // Basic PDF text extraction - look for readable text between PDF markers
-        const textMatches = textContent.match(/\((.*?)\)/g) || [];
-        const cleanedText = textMatches
-          .map(match => match.slice(1, -1)) // Remove parentheses
-          .filter(text => text.length > 2 && /[a-zA-Z]/.test(text)) // Filter meaningful text
-          .join(' ');
+        // Clean the text content by removing problematic characters
+        let cleanedContent = textContent
+          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ') // Remove control characters
+          .replace(/[^\x20-\x7E\s]/g, ' ') // Keep only printable ASCII and whitespace
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .trim();
 
-        if (cleanedText.length > 50) {
-          extractedText = cleanedText;
-        } else {
-          // Fallback: extract any readable ASCII text
-          extractedText = textContent
-            .replace(/[^\x20-\x7E\n\r]/g, ' ') // Keep only printable ASCII + newlines
-            .replace(/\s+/g, ' ') // Normalize whitespace
-            .split(' ')
-            .filter(word => word.length > 2 && /[a-zA-Z]/.test(word))
-            .slice(0, 500) // Limit to first 500 words
-            .join(' ');
+        // Extract meaningful words and sentences
+        const words = cleanedContent.split(' ')
+          .filter(word => word.length > 2 && /[a-zA-Z]/.test(word))
+          .slice(0, 1000); // Limit to first 1000 words
+
+        // Look for URLs and extract them separately
+        const urlRegex = /https?:\/\/[^\s]+/g;
+        const urls = textContent.match(urlRegex) || [];
+        
+        // Combine cleaned text with URLs
+        extractedText = words.join(' ');
+        
+        if (urls.length > 0) {
+          extractedText += '\n\nReferences/URLs found:\n' + urls.slice(0, 10).join('\n');
         }
 
+        // If we still don't have enough meaningful content, try alternative extraction
+        if (extractedText.length < 100) {
+          // Look for text between parentheses (common PDF pattern)
+          const textMatches = textContent.match(/\(([^)]+)\)/g) || [];
+          const parenthesesText = textMatches
+            .map(match => match.slice(1, -1)) // Remove parentheses
+            .filter(text => text.length > 3 && /[a-zA-Z]/.test(text))
+            .join(' ');
+
+          if (parenthesesText.length > extractedText.length) {
+            extractedText = parenthesesText;
+          }
+        }
+
+        // Final fallback with better error message
         if (extractedText.length < 50) {
-          extractedText = `Content extracted from ${fileName}.\n\nThis PDF file appears to contain primarily images or formatted content that requires advanced OCR processing. The file has been uploaded successfully, but text extraction is limited. Consider uploading a text-based PDF or manually entering the content.`;
+          extractedText = `Content extracted from ${fileName}.\n\nThis PDF appears to contain primarily formatted content, images, or complex layouts that require specialized OCR processing. The file has been uploaded successfully, but automatic text extraction is limited. Please consider:\n\n1. Uploading a text-based PDF\n2. Manually entering the content\n3. Using OCR software to extract text first`;
         }
 
       } catch (pdfError) {
