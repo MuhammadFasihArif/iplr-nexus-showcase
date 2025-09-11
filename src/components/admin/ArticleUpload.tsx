@@ -89,10 +89,28 @@ const ArticleUpload = () => {
 
         fileUrl = fileName;
         
-        // For demo purposes, we'll use a simple text extraction
-        // In a real app, you'd call an edge function to extract text from PDF/Word
+        // Extract text from the uploaded file using edge function
         if (!extractedContent) {
-          extractedContent = `Content extracted from ${selectedFile.name}.\n\nThis is a placeholder for the extracted content. In a production system, this would contain the actual text extracted from the uploaded document using specialized libraries for PDF and Word document processing.`;
+          try {
+            console.log('Calling text extraction function for:', fileName);
+            const { data: extractionResult, error: extractionError } = await supabase.functions
+              .invoke('extract-text', {
+                body: { fileName }
+              });
+
+            if (extractionError) {
+              console.error('Text extraction error:', extractionError);
+              extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service encountered an issue. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
+            } else if (extractionResult?.extractedText) {
+              extractedContent = extractionResult.extractedText;
+              console.log('Text successfully extracted, length:', extractedContent.length);
+            } else {
+              extractedContent = `Content extracted from ${selectedFile.name}.\n\nNo readable text content was found in this file. The file has been uploaded successfully, but may contain primarily images or require manual content entry.`;
+            }
+          } catch (error) {
+            console.error('Error calling text extraction function:', error);
+            extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service is currently unavailable. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
+          }
         }
       }
 
