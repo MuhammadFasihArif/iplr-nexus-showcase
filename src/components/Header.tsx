@@ -28,7 +28,7 @@ const Header = () => {
               IPLR
             </h1>
             <p className="text-xs font-body text-muted-foreground uppercase tracking-[0.2em] border-t border-b border-border py-1">
-              INSTITUTE FOR PROFESSIONAL LEARNING & RESEARCH
+              INSTITUTE OF POLICY AND LAW REFORMS
             </p>
           </div>
 

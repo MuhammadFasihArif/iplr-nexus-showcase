@@ -13,7 +13,7 @@ const Footer = () => {
             <div>
               <h3 className="text-xl font-academic font-bold mb-2">IPLR</h3>
               <p className="text-sm font-body opacity-80 leading-relaxed">
-                Institute for Professional Learning & Research - Advancing education through innovative research, publications, and professional development.
+                Institute of Policy and Law Reforms - Advancing policy research, legal analysis, and institutional reform through innovative research and publications.
               </p>
             </div>
             <div className="flex space-x-4">
@@ -56,11 +56,11 @@ const Footer = () => {
             <h4 className="font-academic font-semibold mb-4">Research Areas</h4>
             <nav className="flex flex-col space-y-3">
               {[
-                "Educational Technology",
-                "Cognitive Science", 
-                "STEM Education",
-                "Assessment Methods",
-                "AI & Education"
+                "Legal Research",
+                "Policy Analysis", 
+                "Constitutional Law",
+                "Administrative Law",
+                "Reform Studies"
               ].map((area) => (
                 <a
                   key={area}
@@ -115,7 +115,7 @@ const Footer = () => {
 
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <p className="text-sm font-body opacity-60">
-            © 2024 Institute for Professional Learning & Research. All rights reserved.
+            © 2024 Institute of Policy and Law Reforms. All rights reserved.
           </p>
           <div className="flex space-x-6">
             {["Privacy Policy", "Terms of Service", "Academic Standards"].map((link) => (
