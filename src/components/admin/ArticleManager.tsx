@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, User, Eye, Star, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 
 interface Article {
@@ -14,6 +15,7 @@ interface Article {
   featured: boolean;
   published: boolean;
   created_at: string;
+  file_url?: string | null;
 }
 
 const ArticleManager = () => {
@@ -25,7 +27,7 @@ const ArticleManager = () => {
     try {
       const { data, error } = await supabase
         .from('articles')
-        .select('id, title, author, category, featured, published, created_at')
+        .select('id, title, author, category, featured, published, created_at, file_url')
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -40,6 +42,47 @@ const ArticleManager = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const deleteArticle = async (article: Article) => {
+    try {
+      // Delete DB row first
+      const { error: dbError } = await supabase
+        .from('articles')
+        .delete()
+        .eq('id', article.id);
+      if (dbError) throw dbError;
+
+      // If there is an uploaded file in storage, remove it
+      if (article.file_url) {
+        const { error: storageError } = await supabase
+          .storage
+          .from('articles')
+          .remove([article.file_url]);
+        if (storageError) {
+          // Not fatal; show warning but continue
+          console.warn('Failed to remove storage object:', storageError);
+          toast({
+            title: 'Warning',
+            description: 'Article deleted, but file removal failed.',
+          });
+        }
+      }
+
+      // Update local state
+      setArticles(prev => prev.filter(a => a.id !== article.id));
+
+      toast({
+        title: 'Deleted',
+        description: 'Article has been deleted successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete article',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -177,6 +220,27 @@ const ArticleManager = () => {
             <Badge variant="outline" className="text-xs">
               {article.category}
             </Badge>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="destructive" className="text-xs">
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete this article?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the article{article.file_url ? ' and its uploaded file' : ''}.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteArticle(article)}>Delete</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       ))}

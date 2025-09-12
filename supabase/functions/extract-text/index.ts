@@ -50,115 +50,89 @@ serve(async (req) => {
 
     let extractedText = '';
 
-    // Check file type and extract text accordingly
+    // ===== PDF HANDLING =====
     if (fileName.toLowerCase().endsWith('.pdf')) {
       console.log('Processing PDF file');
-      
-      // For PDF files, we'll use a simple text extraction approach
-      // In a production environment, you'd use a more sophisticated PDF parser
       try {
-        // Convert to string and look for text patterns
-        const textContent = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array);
-        
-        // Clean the text content by removing problematic characters
-        let cleanedContent = textContent
-          .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ') // Remove control characters
-          .replace(/[^\x20-\x7E\s]/g, ' ') // Keep only printable ASCII and whitespace
-          .replace(/\s+/g, ' ') // Normalize whitespace
-          .trim();
+        // Try using pdf-ts which might work better
+        const pdfTs = await import('https://esm.sh/pdf-ts@1.0.0');
+        const data = await pdfTs.extractText(uint8Array);
+        extractedText = data;
 
-        // Extract meaningful words and sentences
-        const words = cleanedContent.split(' ')
-          .filter(word => word.length > 2 && /[a-zA-Z]/.test(word))
-          .slice(0, 1000); // Limit to first 1000 words
+        console.log('PDF text extracted, length:', extractedText.length);
 
-        // Look for URLs and extract them separately
-        const urlRegex = /https?:\/\/[^\s]+/g;
-        const urls = textContent.match(urlRegex) || [];
-        
-        // Combine cleaned text with URLs
-        extractedText = words.join(' ');
-        
-        if (urls.length > 0) {
-          extractedText += '\n\nReferences/URLs found:\n' + urls.slice(0, 10).join('\n');
-        }
-
-        // If we still don't have enough meaningful content, try alternative extraction
-        if (extractedText.length < 100) {
-          // Look for text between parentheses (common PDF pattern)
-          const textMatches = textContent.match(/\(([^)]+)\)/g) || [];
-          const parenthesesText = textMatches
-            .map(match => match.slice(1, -1)) // Remove parentheses
-            .filter(text => text.length > 3 && /[a-zA-Z]/.test(text))
-            .join(' ');
-
-          if (parenthesesText.length > extractedText.length) {
-            extractedText = parenthesesText;
-          }
-        }
-
-        // Final fallback with better error message
-        if (extractedText.length < 50) {
-          extractedText = `Content extracted from ${fileName}.\n\nThis PDF appears to contain primarily formatted content, images, or complex layouts that require specialized OCR processing. The file has been uploaded successfully, but automatic text extraction is limited. Please consider:\n\n1. Uploading a text-based PDF\n2. Manually entering the content\n3. Using OCR software to extract text first`;
+        // If no text was extracted, this is likely an image-based PDF
+        if (!extractedText || extractedText.replace(/\s/g, '').length < 30) {
+          console.log('PDF appears to be image-based or has no text layer');
+          extractedText = `⚠️ This PDF appears to be scanned or image-based. The file has been uploaded successfully, but automatic text extraction requires OCR processing which is not currently available. Please manually enter the content or use an OCR tool to extract text first.`;
+        } else {
+          // Clean up the extracted text
+          extractedText = extractedText
+            .replace(/\s+/g, ' ')
+            .replace(/(.)\1{3,}/g, '$1$1') // Remove excessive character repetition
+            .trim();
         }
 
       } catch (pdfError) {
         console.error('PDF processing error:', pdfError);
-        extractedText = `Content extracted from ${fileName}.\n\nPDF processing encountered an issue. The file has been uploaded successfully, but automatic text extraction failed. Please consider manually entering the content or ensuring the PDF contains selectable text.`;
+        extractedText = `⚠️ PDF processing failed for ${fileName}. The file was uploaded, but text could not be extracted. Please manually enter the content.`;
       }
 
+    // ===== DOCX HANDLING =====
     } else if (fileName.toLowerCase().endsWith('.docx')) {
       console.log('Processing DOCX file');
-      
-      // Basic DOCX text extraction
       try {
         const textContent = new TextDecoder('utf-8', { fatal: false }).decode(uint8Array);
-        
-        // Look for text content in DOCX XML structure
+
+        // Extract text nodes from DOCX XML
         const textMatches = textContent.match(/<w:t[^>]*>(.*?)<\/w:t>/g) || [];
         const cleanedText = textMatches
-          .map(match => match.replace(/<[^>]*>/g, '')) // Remove XML tags
+          .map(match => match.replace(/<[^>]*>/g, ''))
           .filter(text => text.length > 0)
           .join(' ');
 
-        extractedText = cleanedText.length > 50 ? cleanedText : 
-          `Content extracted from ${fileName}.\n\nThis Word document requires advanced processing. The file has been uploaded successfully, but text extraction is limited. Please consider manually entering the content.`;
+        extractedText = cleanedText.length > 50
+          ? cleanedText
+          : `⚠️ Limited text extracted from ${fileName}. Advanced processing may be required.`;
 
       } catch (docxError) {
         console.error('DOCX processing error:', docxError);
-        extractedText = `Content extracted from ${fileName}.\n\nWord document processing encountered an issue. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content.`;
+        extractedText = `⚠️ Could not extract text from ${fileName}. Please try manually entering content.`;
       }
 
+    // ===== DOC HANDLING =====
     } else if (fileName.toLowerCase().endsWith('.doc')) {
       console.log('Processing DOC file');
-      extractedText = `Content extracted from ${fileName}.\n\nLegacy Word (.doc) files require specialized processing. The file has been uploaded successfully, but automatic text extraction is not available for this format. Please consider converting to .docx or manually entering the content.`;
+      extractedText = `⚠️ Legacy Word (.doc) files are not supported for automatic extraction. Please convert to .docx or manually enter the content.`;
+
+    // ===== UNSUPPORTED =====
     } else {
-      extractedText = `Content extracted from ${fileName}.\n\nUnsupported file format for text extraction. The file has been uploaded successfully, but automatic text extraction is only available for PDF and Word documents.`;
+      extractedText = `⚠️ Unsupported file format. Automatic extraction is only available for PDF and DOCX files.`;
     }
 
     console.log('Text extraction completed, length:', extractedText.length);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        extractedText: extractedText.slice(0, 5000) // Limit to 5000 characters
+      JSON.stringify({
+        success: true,
+        extractedText: extractedText.slice(0, 5000), // Limit to 5000 chars
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
 
   } catch (error) {
     console.error('Error in extract-text function:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: 'Internal server error during text extraction',
-        details: error.message 
+        details: error.message,
       }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   }
