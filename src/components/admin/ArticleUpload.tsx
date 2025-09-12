@@ -89,27 +89,34 @@ const ArticleUpload = () => {
 
         fileUrl = fileName;
         
-        // Extract text from the uploaded file using edge function
+        // Extract text from the uploaded file using Python API
         if (!extractedContent) {
           try {
-            console.log('Calling text extraction function for:', fileName);
-            const { data: extractionResult, error: extractionError } = await supabase.functions
-              .invoke('extract-text', {
-                body: { fileName }
-              });
-
-            if (extractionError) {
-              console.error('Text extraction error:', extractionError);
-              extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service encountered an issue. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
-            } else if (extractionResult?.extractedText) {
+            console.log('Calling Python text extraction API for:', fileName);
+            
+            // Create FormData to send file to Python API
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            const response = await fetch('http://localhost:5000/extract-text', {
+              method: 'POST',
+              body: formData,
+            });
+            
+            const extractionResult = await response.json();
+            
+            if (!response.ok || !extractionResult.success) {
+              console.error('Text extraction error:', extractionResult.error);
+              extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service encountered an issue: ${extractionResult.error || 'Unknown error'}. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
+            } else if (extractionResult.extractedText) {
               extractedContent = extractionResult.extractedText;
               console.log('Text successfully extracted, length:', extractedContent.length);
             } else {
               extractedContent = `Content extracted from ${selectedFile.name}.\n\nNo readable text content was found in this file. The file has been uploaded successfully, but may contain primarily images or require manual content entry.`;
             }
           } catch (error) {
-            console.error('Error calling text extraction function:', error);
-            extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service is currently unavailable. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
+            console.error('Error calling text extraction API:', error);
+            extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service is currently unavailable. Please make sure the Python API server is running on http://localhost:5000. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
           }
         }
       }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, User, Clock, BookOpen } from "lucide-react";
+import { Calendar, User, Clock, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,21 +15,38 @@ interface Article {
   readTime: string;
   category: string;
   featured?: boolean;
+  featured_image_url?: string;
+  featured_image_alt?: string;
 }
 
 const ArticleDisplay = () => {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedArticles, setExpandedArticles] = useState<Set<string>>(new Set());
 
   const fetchArticles = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch enhanced articles (articles with featured images) first
+      const { data: enhancedArticles, error: enhancedError } = await supabase
         .from('articles')
         .select('*')
         .eq('published', true)
+        .not('featured_image_url', 'is', null)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      // Fetch regular articles (without featured images)
+      const { data: regularArticles, error: regularError } = await supabase
+        .from('articles')
+        .select('*')
+        .eq('published', true)
+        .is('featured_image_url', null)
+        .order('created_at', { ascending: false });
+
+      if (enhancedError) throw enhancedError;
+      if (regularError) throw regularError;
+
+      // Combine enhanced articles first, then regular articles
+      const data = [...(enhancedArticles || []), ...(regularArticles || [])];
 
       // Transform database articles to match the interface
       const transformedArticles: Article[] = (data || []).map(article => ({
@@ -41,6 +58,8 @@ const ArticleDisplay = () => {
         readTime: `${Math.ceil(article.content.length / 200)} min read`,
         category: article.category,
         featured: article.featured,
+        featured_image_url: article.featured_image_url,
+        featured_image_alt: article.featured_image_alt,
       }));
 
       setArticles(transformedArticles);
@@ -51,6 +70,18 @@ const ArticleDisplay = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleArticleExpansion = (articleId: string) => {
+    setExpandedArticles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(articleId)) {
+        newSet.delete(articleId);
+      } else {
+        newSet.add(articleId);
+      }
+      return newSet;
+    });
   };
 
   useEffect(() => {
@@ -142,14 +173,14 @@ const ArticleDisplay = () => {
   ];
 
   return (
-    <section id="full-articles" className="py-16 px-6 bg-background">
+    <section id="article-display" className="py-16 px-6 bg-background">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-academic font-bold text-foreground mb-4">
-            Featured Articles
+            Enhanced Articles
           </h2>
           <p className="font-body text-muted-foreground max-w-2xl mx-auto">
-            In-depth articles exploring the latest trends, research, and insights in professional learning and development
+            In-depth articles with rich content, images, and insights in professional learning and development
           </p>
         </div>
 
@@ -177,6 +208,17 @@ const ArticleDisplay = () => {
               key={article.id} 
               className="p-8 border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300 bg-card"
             >
+              {/* Featured Image */}
+              {article.featured_image_url && (
+                <div className="mb-6">
+                  <img
+                    src={article.featured_image_url}
+                    alt={article.featured_image_alt || article.title}
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
+                </div>
+              )}
+
               {/* Article Header */}
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -219,11 +261,34 @@ const ArticleDisplay = () => {
 
               {/* Article Content */}
               <div className="prose prose-gray max-w-none">
-                {article.content.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="font-body text-foreground/90 leading-relaxed mb-4 text-justify">
-                    {paragraph.trim()}
-                  </p>
-                ))}
+                {(() => {
+                  const isExpanded = expandedArticles.has(article.id);
+                  const paragraphs = article.content.split('\n\n').filter(p => p.trim().length > 0);
+                  
+                  if (isExpanded) {
+                    // Show full content
+                    return (
+                      <div>
+                        {paragraphs.map((paragraph, index) => (
+                          <p key={index} className="font-body text-foreground/90 leading-relaxed mb-4 text-justify">
+                            {paragraph.trim()}
+                          </p>
+                        ))}
+                      </div>
+                    );
+                  } else {
+                    // Show preview
+                    const previewParagraph = paragraphs[0] || article.content.substring(0, 500);
+                    return (
+                      <p className="font-body text-foreground/90 leading-relaxed mb-4 text-justify">
+                        {previewParagraph.length > 500 
+                          ? previewParagraph.substring(0, 500) + '...'
+                          : previewParagraph
+                        }
+                      </p>
+                    );
+                  }
+                })()}
               </div>
 
               {/* Article Footer */}
@@ -240,8 +305,19 @@ const ArticleDisplay = () => {
                   variant="default" 
                   size="sm" 
                   className="font-body bg-foreground text-background hover:bg-foreground/90"
+                  onClick={() => toggleArticleExpansion(article.id)}
                 >
-                  Read More
+                  {expandedArticles.has(article.id) ? (
+                    <>
+                      <ChevronUp className="h-4 w-4 mr-1" />
+                      Read Less
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4 mr-1" />
+                      Read More
+                    </>
+                  )}
                 </Button>
               </div>
             </Card>

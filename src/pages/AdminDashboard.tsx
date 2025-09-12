@@ -4,10 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Plus, FileText, Image, Video, Users } from "lucide-react";
+import { LogOut, Plus, FileText, Image, Video, Users, Settings } from "lucide-react";
 import ArticleUpload from "@/components/admin/ArticleUpload";
 import MediaUpload from "@/components/admin/MediaUpload";
+import EnhancedArticleUpload from "@/components/admin/EnhancedArticleUpload";
+import EnhancedMediaUpload from "@/components/admin/EnhancedMediaUpload";
 import ArticleManager from "@/components/admin/ArticleManager";
+import MediaGallery from "@/components/admin/MediaGallery";
+import HeroCarouselManager from "@/components/admin/HeroCarouselManager";
+import TestMediaUpload from "@/components/admin/TestMediaUpload";
 
 const AdminDashboard = () => {
   const [adminSession, setAdminSession] = useState<any>(null);
@@ -147,10 +152,12 @@ const AdminDashboard = () => {
 
           {/* Management Tabs */}
           <Tabs defaultValue="articles" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="articles">Articles</TabsTrigger>
+              <TabsTrigger value="enhanced-articles">Enhanced Articles</TabsTrigger>
               <TabsTrigger value="media">Media</TabsTrigger>
-              <TabsTrigger value="videos">Videos</TabsTrigger>
+              <TabsTrigger value="hero">Hero Carousel</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
             
             <TabsContent value="articles" className="space-y-6">
@@ -184,37 +191,87 @@ const AdminDashboard = () => {
               </div>
             </TabsContent>
             
+            <TabsContent value="enhanced-articles" className="space-y-6">
+              <EnhancedArticleUpload />
+            </TabsContent>
+            
             <TabsContent value="media" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Image className="h-5 w-5" />
+                      Upload Media
+                    </CardTitle>
+                    <CardDescription>
+                      Upload images and add video links
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <MediaUpload />
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Media Gallery</CardTitle>
+                    <CardDescription>
+                      View and manage all uploaded media
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <MediaGallery />
+                  </CardContent>
+                </Card>
+              </div>
+
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Image className="h-5 w-5" />
-                    Media Management
-                  </CardTitle>
+                  <CardTitle>Media Upload Diagnostics</CardTitle>
                   <CardDescription>
-                    Upload and manage images for the website
+                    Test database and storage connections
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <MediaUpload />
+                  <TestMediaUpload />
+                </CardContent>
+              </Card>
+              
+              {/* Enhanced Media Upload */}
+              <EnhancedMediaUpload />
+            </TabsContent>
+            
+            <TabsContent value="hero" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Hero Carousel Management
+                  </CardTitle>
+                  <CardDescription>
+                    Manage the rotating images and content on the homepage
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <HeroCarouselManager />
                 </CardContent>
               </Card>
             </TabsContent>
             
-            <TabsContent value="videos" className="space-y-6">
+            <TabsContent value="settings" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Video className="h-5 w-5" />
-                    Video Links
+                    <Settings className="h-5 w-5" />
+                    Site Settings
                   </CardTitle>
                   <CardDescription>
-                    Add YouTube, Vimeo, and other video links
+                    Configure website settings and preferences
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-8 text-muted-foreground">
-                    Video management coming soon
+                    Site settings coming soon
                   </div>
                 </CardContent>
               </Card>

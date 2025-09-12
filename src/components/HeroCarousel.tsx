@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import heroImage1 from "@/assets/hero-1.jpg";
 import heroImage2 from "@/assets/hero-2.jpg";
 import heroImage3 from "@/assets/hero-3.jpg";
@@ -14,8 +15,11 @@ interface Slide {
 
 const HeroCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const slides: Slide[] = [
+  // Default fallback slides
+  const defaultSlides: Slide[] = [
     {
       image: heroImage1,
       title: "Advancing Academic Excellence",
@@ -36,6 +40,43 @@ const HeroCarousel = () => {
     }
   ];
 
+  const fetchSlides = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('hero_slides')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching hero slides:', error);
+        setSlides(defaultSlides);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const formattedSlides: Slide[] = data.map(slide => ({
+          image: slide.image_url,
+          title: slide.title,
+          subtitle: slide.subtitle,
+          description: slide.description
+        }));
+        setSlides(formattedSlides);
+      } else {
+        setSlides(defaultSlides);
+      }
+    } catch (error) {
+      console.error('Error fetching hero slides:', error);
+      setSlides(defaultSlides);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSlides();
+  }, []);
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
@@ -46,9 +87,37 @@ const HeroCarousel = () => {
 
   // Auto-slide functionality
   useEffect(() => {
-    const interval = setInterval(nextSlide, 6000);
-    return () => clearInterval(interval);
-  }, []);
+    if (slides.length > 1) {
+      const interval = setInterval(nextSlide, 6000);
+      return () => clearInterval(interval);
+    }
+  }, [slides.length]);
+
+  if (isLoading) {
+    return (
+      <section className="relative h-[70vh] min-h-[500px] overflow-hidden bg-muted animate-pulse">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center">
+            <div className="h-8 bg-muted-foreground/20 rounded w-64 mb-4"></div>
+            <div className="h-4 bg-muted-foreground/20 rounded w-48"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (slides.length === 0) {
+    return (
+      <section className="relative h-[70vh] min-h-[500px] overflow-hidden bg-muted">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center text-muted-foreground">
+            <h1 className="text-4xl font-bold mb-4">Welcome to IPLR</h1>
+            <p className="text-lg">No slides available</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative h-[70vh] min-h-[500px] overflow-hidden">

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Media Upload Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        input[type="file"] { margin: 10px 0; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Media Upload Test & Fix</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Database Connection</h2>
+        <button onclick="testDatabase()">Test Database</button>
+        <div id="dbResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Storage Bucket</h2>
+        <button onclick="testStorage()">Test Storage</button>
+        <div id="storageResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test File Upload</h2>
+        <input type="file" id="fileInput" accept="image/*" />
+        <button onclick="testUpload()">Test Upload</button>
+        <div id="uploadResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Create Missing Tables (Manual SQL)</h2>
+        <p>If tests fail, copy and run this SQL in your Supabase dashboard:</p>
+        <textarea id="sqlCommands" rows="20" cols="80" readonly style="width: 100%; font-family: monospace;">
+-- Create hero_slides table
+CREATE TABLE IF NOT EXISTS hero_slides (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  subtitle TEXT NOT NULL,
+  description TEXT NOT NULL,
+  image_url TEXT NOT NULL,
+  order_index INTEGER NOT NULL DEFAULT 1,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE hero_slides ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Allow public read access to hero_slides" ON hero_slides
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow authenticated users to insert hero_slides" ON hero_slides
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated users to update hero_slides" ON hero_slides
+  FOR UPDATE USING (true);
+
+CREATE POLICY "Allow authenticated users to delete hero_slides" ON hero_slides
+  FOR DELETE USING (true);
+
+-- Fix storage policies for media bucket (allow public access)
+DROP POLICY IF EXISTS "Admin can upload media" ON storage.objects;
+DROP POLICY IF EXISTS "Admin can update media" ON storage.objects;
+DROP POLICY IF EXISTS "Admin can delete media" ON storage.objects;
+
+CREATE POLICY "Allow public upload to media files" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'media');
+
+CREATE POLICY "Allow public update media files" ON storage.objects
+  FOR UPDATE USING (bucket_id = 'media');
+
+CREATE POLICY "Allow public delete media files" ON storage.objects
+  FOR DELETE USING (bucket_id = 'media');
+        </textarea>
+        <button onclick="copySQL()">Copy SQL</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+        
+        const supabaseUrl = 'https://nnslaimpizqbgvombfbx.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uc2xhaW1waXpxYmd2b21iZmJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc0MDMwNzUsImV4cCI6MjA3Mjk3OTA3NX0.D9fw8Oqy4CRjR-9Bng5KMe7SVSfqsZ9jw59Gicb9To0';
+        
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        
+        window.testDatabase = async function() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = '<span class="info">Testing database connection...</span>';
+            
+            try {
+                // Test media_uploads table
+                const { data: mediaData, error: mediaError } = await supabase
+                    .from('media_uploads')
+                    .select('count')
+                    .limit(1);
+                
+                if (mediaError) {
+                    resultDiv.innerHTML = `<span class="error">❌ media_uploads table error: ${mediaError.message}</span>`;
+                    return;
+                }
+                
+                // Test hero_slides table
+                const { data: heroData, error: heroError } = await supabase
+                    .from('hero_slides')
+                    .select('count')
+                    .limit(1);
+                
+                if (heroError) {
+                    resultDiv.innerHTML = `<span class="error">❌ hero_slides table missing: ${heroError.message}<br>✅ media_uploads table exists</span>`;
+                } else {
+                    resultDiv.innerHTML = '<span class="success">✅ Both tables exist and are accessible</span>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Connection error: ${error.message}</span>`;
+            }
+        };
+        
+        window.testStorage = async function() {
+            const resultDiv = document.getElementById('storageResult');
+            resultDiv.innerHTML = '<span class="info">Testing storage bucket...</span>';
+            
+            try {
+                const { data: storageData, error: storageError } = await supabase.storage
+                    .from('media')
+                    .list('', { limit: 1 });
+                
+                if (storageError) {
+                    resultDiv.innerHTML = `<span class="error">❌ Storage bucket error: ${storageError.message}</span>`;
+                } else {
+                    resultDiv.innerHTML = '<span class="success">✅ Media storage bucket is accessible</span>';
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Storage error: ${error.message}</span>`;
+            }
+        };
+        
+        window.testUpload = async function() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('uploadResult');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '<span class="error">❌ Please select a file first</span>';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            resultDiv.innerHTML = '<span class="info">Testing file upload...</span>';
+            
+            try {
+                // Test upload to storage
+                const fileName = `test-${Date.now()}-${file.name}`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('media')
+                    .upload(fileName, file);
+                
+                if (uploadError) {
+                    resultDiv.innerHTML = `<span class="error">❌ Upload failed: ${uploadError.message}</span>`;
+                    return;
+                }
+                
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('media')
+                    .getPublicUrl(fileName);
+                
+                // Test database insert
+                const { error: dbError } = await supabase
+                    .from('media_uploads')
+                    .insert({
+                        filename: file.name,
+                        file_url: publicUrl,
+                        file_type: 'image',
+                        mime_type: file.type,
+                        file_size: file.size,
+                        alt_text: 'Test upload',
+                        description: 'Test upload from admin panel',
+                    });
+                
+                if (dbError) {
+                    resultDiv.innerHTML = `<span class="error">❌ Database insert failed: ${dbError.message}</span>`;
+                    // Clean up uploaded file
+                    await supabase.storage.from('media').remove([uploadData.path]);
+                    return;
+                }
+                
+                resultDiv.innerHTML = `<span class="success">✅ Upload successful!<br>File: ${file.name}<br>URL: ${publicUrl}</span>`;
+                
+                // Clean up test file
+                setTimeout(async () => {
+                    await supabase.storage.from('media').remove([uploadData.path]);
+                    await supabase.from('media_uploads').delete().eq('filename', file.name);
+                }, 5000);
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Upload error: ${error.message}</span>`;
+            }
+        };
+        
+        window.copySQL = function() {
+            const textarea = document.getElementById('sqlCommands');
+            textarea.select();
+            document.execCommand('copy');
+            alert('SQL commands copied to clipboard!');
+        };
+    </script>
+</body>
+</html>
