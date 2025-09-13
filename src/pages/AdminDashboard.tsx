@@ -322,7 +322,7 @@ const AdminDashboard = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Awareness Campaigns Gallery</CardTitle>
+                    <CardTitle>Workshops & Training Gallery</CardTitle>
                     <CardDescription>
                       View and manage all uploaded media
                     </CardDescription>

@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Send, Instagram } from "lucide-react";
+import { Mail, MapPin, Send, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -36,16 +36,6 @@ const ContactSection = () => {
                 </div>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="p-3 border border-border rounded-sm">
-                  <Phone className="h-5 w-5 text-foreground" />
-                </div>
-                <div>
-                  <h4 className="font-body font-semibold text-foreground mb-1">Phone</h4>
-                  <p className="font-body text-muted-foreground">+1 (555) 123-4567</p>
-                  <p className="font-body text-muted-foreground">+1 (555) 987-6543</p>
-                </div>
-              </div>
 
               <div className="flex items-start space-x-4">
                 <div className="p-3 border border-border rounded-sm">
@@ -53,7 +43,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-body font-semibold text-foreground mb-1">Address</h4>
-                  <p className="font-body text-muted-foreground">123 Academic Street<br />University District<br />City, State 12345</p>
+                  <p className="font-body text-muted-foreground">15-XX Khayaban-e-Iqbal<br />DHA Lahore Cantt<br />(Second Floor)</p>
                 </div>
               </div>
 

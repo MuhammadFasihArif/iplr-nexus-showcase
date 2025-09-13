@@ -1,0 +1,19 @@
+<svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="300" fill="#1a1a1a"/>
+  
+  <!-- Play button circle -->
+  <circle cx="200" cy="150" r="40" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+  
+  <!-- Play button triangle -->
+  <path d="M185 135 L185 165 L205 150 Z" fill="white"/>
+  
+  <!-- Video icon -->
+  <g transform="translate(20, 20)">
+    <rect x="0" y="0" width="40" height="30" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" rx="4"/>
+    <path d="M15 8 L25 15 L15 22 Z" fill="rgba(255,255,255,0.3)"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="200" y="220" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="500">Video Content</text>
+</svg>

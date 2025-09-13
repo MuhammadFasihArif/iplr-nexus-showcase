@@ -52,7 +52,7 @@ const PublicMediaGallery = () => {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Awareness Campaigns</h2>
+            <h2 className="text-3xl font-bold mb-4">Workshops & Training</h2>
             <p className="text-muted-foreground">Loading our latest media...</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -76,7 +76,7 @@ const PublicMediaGallery = () => {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h2 className="text-3xl font-bold mb-4">Awareness Campaigns</h2>
+            <h2 className="text-3xl font-bold mb-4">Workshops & Training</h2>
             <p className="text-muted-foreground">No media available yet. Check back soon!</p>
           </div>
         </div>
@@ -88,7 +88,7 @@ const PublicMediaGallery = () => {
     <section className="py-16 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold mb-4">Awareness Campaigns</h2>
+          <h2 className="text-3xl font-bold mb-4">Workshops & Training</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Explore our collection of images and videos showcasing our latest work and achievements.
           </p>
@@ -191,7 +191,7 @@ const PublicMediaGallery = () => {
         {/* View More Button */}
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
-            View All Campaigns
+            View All Workshops & Training
           </Button>
         </div>
       </div>

@@ -125,7 +125,7 @@ const MediaGallery = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Awareness Campaigns Gallery</h3>
+        <h3 className="text-lg font-semibold">Workshops & Training Gallery</h3>
         <div className="text-sm text-muted-foreground">
           {filteredMedia.length} of {mediaItems.length} items
         </div>

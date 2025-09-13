@@ -57,10 +57,97 @@ const DynamicMasonryGrid = () => {
   const [activeFilter, setActiveFilter] = useState<"all" | "articles" | "research" | "workshops">("all");
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [thumbnailCache, setThumbnailCache] = useState<Record<string, string>>({});
+
+  // Function to fetch Instagram thumbnail asynchronously
+  const fetchInstagramThumbnail = async (url: string): Promise<string> => {
+    if (thumbnailCache[url]) {
+      return thumbnailCache[url];
+    }
+    
+    try {
+      const response = await fetch(`/api/instagram-thumbnail?url=${encodeURIComponent(url)}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setThumbnailCache(prev => ({ ...prev, [url]: data.thumbnailUrl }));
+        return data.thumbnailUrl;
+      }
+    } catch (error) {
+      console.error('Error fetching Instagram thumbnail:', error);
+    }
+    
+    // Fallback
+    const fallback = "/video-placeholder.svg";
+    setThumbnailCache(prev => ({ ...prev, [url]: fallback }));
+    return fallback;
+  };
+
+  // Function to generate video thumbnail from various platforms
+  const getVideoThumbnail = (url: string): string => {
+    if (!url) return "/placeholder.svg";
+    
+    // Check cache first
+    if (thumbnailCache[url]) {
+      return thumbnailCache[url];
+    }
+    
+    // YouTube thumbnail
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const videoId = url.includes('youtu.be') 
+        ? url.split('youtu.be/')[1]?.split('?')[0]
+        : url.split('v=')[1]?.split('&')[0];
+      
+      if (videoId) {
+        const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        setThumbnailCache(prev => ({ ...prev, [url]: thumbnail }));
+        return thumbnail;
+      }
+    }
+    
+    // Vimeo thumbnail
+    if (url.includes('vimeo.com')) {
+      const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
+      if (videoId) {
+        const thumbnail = `https://vumbnail.com/${videoId}.jpg`;
+        setThumbnailCache(prev => ({ ...prev, [url]: thumbnail }));
+        return thumbnail;
+      }
+    }
+    
+    // Instagram Reels/Posts - Start async fetch and return placeholder
+    if (url.includes('instagram.com')) {
+      const instagramMatch = url.match(/instagram\.com\/(p|reel)\/([A-Za-z0-9_-]+)/);
+      if (instagramMatch) {
+        // Start async fetch
+        fetchInstagramThumbnail(url);
+        // Return placeholder immediately
+        return "/video-placeholder.svg";
+      }
+    }
+    
+    // TikTok - Use TikTok oEmbed API
+    if (url.includes('tiktok.com')) {
+      return "/video-placeholder.svg";
+    }
+    
+    // Generic video platforms - return a video icon placeholder
+    if (url.includes('video') || url.includes('watch') || url.includes('play')) {
+      return "/video-placeholder.svg";
+    }
+    
+    // Default placeholder
+    return "/placeholder.svg";
+  };
 
   useEffect(() => {
     fetchContent();
   }, []);
+
+  // Effect to trigger re-render when thumbnails are loaded
+  useEffect(() => {
+    // This will trigger a re-render when thumbnailCache changes
+  }, [thumbnailCache]);
 
   const fetchContent = async () => {
     try {
@@ -87,13 +174,13 @@ const DynamicMasonryGrid = () => {
         console.error('Error fetching articles:', articlesError);
       }
 
-      // Fetch video thumbnails and video files
+      // Fetch video thumbnails, video files, and video links
       const { data: media, error: mediaError } = await supabase
         .from('media_uploads')
         .select('*')
-        .in('file_type', ['video_thumbnail', 'video_file'])
+        .in('file_type', ['video_thumbnail', 'video_file', 'video_link'])
         .order('created_at', { ascending: false })
-        .limit(8);
+        .limit(12);
 
       if (mediaError) {
         console.error('Error fetching media:', mediaError);
@@ -131,7 +218,7 @@ const DynamicMasonryGrid = () => {
         file_url: article.file_url
       }));
 
-      // Transform video thumbnails and video files to content items
+      // Transform video thumbnails, video files, and video links to content items
       const videoItems: ContentItem[] = (media || []).map((item, index) => ({
         id: `video-${item.id}`,
         type: "video" as const,
@@ -141,9 +228,9 @@ const DynamicMasonryGrid = () => {
         date: new Date(item.created_at).toLocaleDateString(),
         readTime: "Watch",
         category: "Video",
-        thumbnail: item.file_url,
+        thumbnail: item.file_type === 'video_link' ? item.file_url : item.file_url,
         size: index < 2 ? "medium" as const : "small" as const,
-        external_url: item.external_url,
+        external_url: item.external_url || (item.file_type === 'video_link' ? item.file_url : null),
         file_type: item.file_type
       }));
 
@@ -193,6 +280,9 @@ const DynamicMasonryGrid = () => {
       if (item.file_type === "video_file") {
         // For video files, open the video URL
         window.open(item.thumbnail, '_blank');
+      } else if (item.file_type === "video_link") {
+        // For video links, open the video URL directly
+        window.open(item.external_url || item.thumbnail, '_blank');
       } else if (item.external_url) {
         // For video thumbnails, open external URL
         window.open(item.external_url, '_blank');
@@ -310,6 +400,12 @@ const DynamicMasonryGrid = () => {
                     className="absolute inset-0 w-full h-full"
                     previewDuration={5}
                   />
+                ) : item.type === "video" && item.file_type === "video_link" ? (
+                  <img 
+                    src={getVideoThumbnail(item.external_url || item.thumbnail)}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 ) : (
                   <img 
                     src={item.thumbnail}
@@ -343,19 +439,19 @@ const DynamicMasonryGrid = () => {
                   </div>
 
                   {/* Title */}
-                  <h3 className="academic-title text-lg md:text-xl mb-2 group-hover:text-white/90 transition-colors duration-300">
+                  <h3 className="text-lg md:text-xl mb-2 text-white group-hover:text-white/90 transition-colors duration-300 drop-shadow-lg font-academic font-semibold leading-tight">
                     {item.title}
                   </h3>
 
                   {/* Description - only show on larger cards */}
                   {(item.size === "featured" || item.size === "large") && (
-                    <p className="font-body text-sm text-white/80 mb-3 line-clamp-2">
+                    <p className="font-body text-sm text-white/90 mb-3 line-clamp-2 drop-shadow-md">
                       {item.description}
                     </p>
                   )}
 
                   {/* Meta Info */}
-                  <div className="flex items-center justify-between text-xs font-body text-white/70">
+                  <div className="flex items-center justify-between text-xs font-body text-white/80">
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1">
                         <User className="h-3 w-3" />
@@ -376,7 +472,7 @@ const DynamicMasonryGrid = () => {
                           <Download className="h-3 w-3 text-white" />
                         </button>
                       )}
-                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <ExternalLink className="h-3 w-3 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                   </div>
                 </div>

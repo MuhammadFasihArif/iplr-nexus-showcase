@@ -1,4 +1,4 @@
-import { Youtube, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Youtube, Instagram, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -102,11 +102,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3 text-sm font-body opacity-80">
                 <MapPin className="h-4 w-4 flex-shrink-0" />
-                <span>123 Academic Street, University District, City</span>
-              </div>
-              <div className="flex items-center space-x-3 text-sm font-body opacity-80">
-                <Phone className="h-4 w-4 flex-shrink-0" />
-                <span>+1 (555) 123-4567</span>
+                <span>15-XX Khayaban-e-Iqbal, DHA Lahore Cantt (Second Floor)</span>
               </div>
               <div className="flex items-center space-x-3 text-sm font-body opacity-80">
                 <Mail className="h-4 w-4 flex-shrink-0" />

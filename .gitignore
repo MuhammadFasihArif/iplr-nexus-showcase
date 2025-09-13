@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# PDF-parse workaround directory
+test/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
