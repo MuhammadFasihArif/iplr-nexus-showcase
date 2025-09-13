@@ -194,10 +194,14 @@ def extract_from_base64():
         }), 500
 
 if __name__ == '__main__':
+    # Get port from environment variable (Railway) or default to 5000
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_ENV') != 'production'
+    
     print("🚀 Starting PDF Text Extraction API Server...")
-    print("📡 Server will be available at: http://localhost:5000")
-    print("🔗 Health check: http://localhost:5000/health")
-    print("📄 Extract endpoint: http://localhost:5000/extract-text")
+    print(f"📡 Server will be available at: http://0.0.0.0:{port}")
+    print(f"🔗 Health check: http://0.0.0.0:{port}/health")
+    print(f"📄 Extract endpoint: http://0.0.0.0:{port}/extract-text")
     print("=" * 50)
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
