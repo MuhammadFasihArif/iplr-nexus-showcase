@@ -406,7 +406,7 @@ const EnhancedMediaUpload = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Enhanced Media Upload
+            Enhanced Workshop & Training Upload
           </CardTitle>
           <CardDescription>
             Upload images, video files, video thumbnails with external links, or simple video links

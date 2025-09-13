@@ -54,7 +54,7 @@ interface ContentItem {
 }
 
 const DynamicMasonryGrid = () => {
-  const [activeFilter, setActiveFilter] = useState<"all" | "articles" | "research" | "videos">("all");
+  const [activeFilter, setActiveFilter] = useState<"all" | "articles" | "research" | "workshops">("all");
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -161,7 +161,7 @@ const DynamicMasonryGrid = () => {
     activeFilter === "all" || 
     (activeFilter === "articles" && item.type === "article") ||
     (activeFilter === "research" && item.type === "research") ||
-    (activeFilter === "videos" && item.type === "video")
+    (activeFilter === "workshops" && item.type === "video")
   );
 
   const getSizeClasses = (size: string) => {
@@ -246,7 +246,7 @@ const DynamicMasonryGrid = () => {
           <div className="text-center">
             <h3 className="text-2xl font-academic font-bold text-foreground mb-4">Featured Content</h3>
             <p className="font-body text-muted-foreground mb-8">
-              No featured content available yet. Upload some articles and videos to see them here!
+              No featured content available yet. Upload some articles and workshop materials to see them here!
             </p>
             <Button 
               onClick={() => window.location.href = '/admin'}
@@ -266,7 +266,7 @@ const DynamicMasonryGrid = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-academic font-bold text-foreground mb-4">Featured Content</h2>
-          <p className="font-body text-muted-foreground">Discover our latest articles and educational videos</p>
+          <p className="font-body text-muted-foreground">Discover our latest articles and workshop materials</p>
         </div>
 
         {/* Filter tabs */}
@@ -276,7 +276,7 @@ const DynamicMasonryGrid = () => {
               { key: "all" as const, label: "ALL" },
               { key: "articles" as const, label: "ARTICLES" },
               { key: "research" as const, label: "RESEARCH" },
-              { key: "videos" as const, label: "VIDEOS" }
+              { key: "workshops" as const, label: "WORKSHOPS & TRAININGS" }
             ].map((filter) => (
               <button
                 key={filter.key}

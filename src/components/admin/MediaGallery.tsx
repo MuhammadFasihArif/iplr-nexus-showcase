@@ -125,7 +125,7 @@ const MediaGallery = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Media Gallery</h3>
+        <h3 className="text-lg font-semibold">Awareness Campaigns Gallery</h3>
         <div className="text-sm text-muted-foreground">
           {filteredMedia.length} of {mediaItems.length} items
         </div>
@@ -270,7 +270,7 @@ const MediaGallery = () => {
           <Card className="max-w-4xl w-full max-h-[90vh] overflow-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Media Details</h3>
+                <h3 className="text-lg font-semibold">Campaign Details</h3>
                 <Button
                   variant="ghost"
                   size="sm"

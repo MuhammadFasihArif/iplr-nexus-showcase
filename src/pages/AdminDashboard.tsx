@@ -214,7 +214,7 @@ const AdminDashboard = () => {
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Media Files</CardTitle>
+                <CardTitle className="text-sm font-medium">Workshop & Training Files</CardTitle>
                 <Image className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -263,7 +263,7 @@ const AdminDashboard = () => {
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="articles">Articles</TabsTrigger>
               <TabsTrigger value="enhanced-articles">Enhanced Articles</TabsTrigger>
-              <TabsTrigger value="media">Media</TabsTrigger>
+              <TabsTrigger value="media">Workshops & Trainings</TabsTrigger>
               <TabsTrigger value="hero">Hero Carousel</TabsTrigger>
               <TabsTrigger value="settings">Settings</TabsTrigger>
             </TabsList>
@@ -309,7 +309,7 @@ const AdminDashboard = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Image className="h-5 w-5" />
-                      Upload Media
+                      Upload Workshop & Training Content
                     </CardTitle>
                     <CardDescription>
                       Upload images and add video links
@@ -322,7 +322,7 @@ const AdminDashboard = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Media Gallery</CardTitle>
+                    <CardTitle>Awareness Campaigns Gallery</CardTitle>
                     <CardDescription>
                       View and manage all uploaded media
                     </CardDescription>
@@ -335,7 +335,7 @@ const AdminDashboard = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Media Upload Diagnostics</CardTitle>
+                  <CardTitle>Workshop & Training Upload Diagnostics</CardTitle>
                   <CardDescription>
                     Test database and storage connections
                   </CardDescription>
@@ -345,7 +345,7 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
               
-              {/* Enhanced Media Upload */}
+              {/* Enhanced Workshop & Training Upload */}
               <EnhancedMediaUpload />
             </TabsContent>
             

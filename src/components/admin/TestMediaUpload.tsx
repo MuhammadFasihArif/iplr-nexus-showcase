@@ -113,7 +113,7 @@ const TestMediaUpload = () => {
 
   return (
     <div className="space-y-4 p-4 border rounded-lg">
-      <h3 className="text-lg font-semibold">Media Upload Diagnostics</h3>
+      <h3 className="text-lg font-semibold">Workshop & Training Upload Diagnostics</h3>
       
       <div className="space-y-2">
         <Button onClick={testDatabaseConnection} variant="outline">

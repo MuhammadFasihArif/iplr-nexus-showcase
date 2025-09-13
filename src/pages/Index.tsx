@@ -21,7 +21,7 @@ const Index = () => {
         <section id="research" className="scroll-mt-20">
           <ArticleDisplay />
         </section>
-        <section id="videos" className="scroll-mt-20">
+        <section id="workshops" className="scroll-mt-20">
           <PublicMediaGallery />
         </section>
         <section id="about" className="scroll-mt-20">
