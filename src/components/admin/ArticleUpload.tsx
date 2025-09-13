@@ -98,7 +98,8 @@ const ArticleUpload = () => {
             const formData = new FormData();
             formData.append('file', selectedFile);
             
-            const response = await fetch('http://localhost:5000/extract-text', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${apiUrl}/extract-text`, {
               method: 'POST',
               body: formData,
             });
@@ -116,7 +117,7 @@ const ArticleUpload = () => {
             }
           } catch (error) {
             console.error('Error calling text extraction API:', error);
-            extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service is currently unavailable. Please make sure the Python API server is running on http://localhost:5000. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
+            extractedContent = `Content extracted from ${selectedFile.name}.\n\nText extraction service is currently unavailable. Please make sure the Python API server is running. The file has been uploaded successfully, but automatic text extraction failed. Please manually enter the content below.`;
           }
         }
       }
