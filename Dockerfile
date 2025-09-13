@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Create test directory for pdf-parse workaround
 RUN mkdir -p test/data && touch test/data/05-versions-space.pdf
