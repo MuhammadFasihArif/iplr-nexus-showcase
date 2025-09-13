@@ -31,8 +31,7 @@ const ContactSection = () => {
                 </div>
                 <div>
                   <h4 className="font-body font-semibold text-foreground mb-1">Email</h4>
-                  <p className="font-body text-muted-foreground">research@iplr.org</p>
-                  <p className="font-body text-muted-foreground">info@iplr.org</p>
+                  <p className="font-body text-muted-foreground">iplreform@gmail.com</p>
                 </div>
               </div>
 

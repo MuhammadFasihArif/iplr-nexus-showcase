@@ -106,7 +106,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3 text-sm font-body opacity-80">
                 <Mail className="h-4 w-4 flex-shrink-0" />
-                <span>info@iplr.org</span>
+                <span>iplreform@gmail.com</span>
               </div>
             </div>
           </div>
