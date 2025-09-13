@@ -104,6 +104,11 @@ def health_check():
     """Health check endpoint"""
     return jsonify({"status": "healthy", "service": "PDF Text Extractor API"})
 
+@app.route('/', methods=['GET'])
+def root():
+    """Root endpoint for Railway health checks"""
+    return jsonify({"status": "healthy", "service": "PDF Text Extractor API", "message": "API is running"})
+
 @app.route('/extract-text', methods=['POST'])
 def extract_text():
     """Extract text from PDF file"""
