@@ -46,6 +46,8 @@ export type Database = {
           created_at: string
           featured: boolean | null
           file_url: string | null
+          featured_image_url: string | null
+          featured_image_alt: string | null
           id: string
           published: boolean | null
           title: string
@@ -58,6 +60,8 @@ export type Database = {
           created_at?: string
           featured?: boolean | null
           file_url?: string | null
+          featured_image_url?: string | null
+          featured_image_alt?: string | null
           id?: string
           published?: boolean | null
           title: string
@@ -70,6 +74,8 @@ export type Database = {
           created_at?: string
           featured?: boolean | null
           file_url?: string | null
+          featured_image_url?: string | null
+          featured_image_alt?: string | null
           id?: string
           published?: boolean | null
           title?: string
@@ -87,7 +93,9 @@ export type Database = {
           file_url: string
           filename: string
           id: string
+          is_thumbnail: boolean | null
           mime_type: string | null
+          title: string | null
         }
         Insert: {
           alt_text?: string | null
@@ -98,7 +106,9 @@ export type Database = {
           file_url: string
           filename: string
           id?: string
+          is_thumbnail?: boolean | null
           mime_type?: string | null
+          title?: string | null
         }
         Update: {
           alt_text?: string | null
@@ -109,7 +119,9 @@ export type Database = {
           file_url?: string
           filename?: string
           id?: string
+          is_thumbnail?: boolean | null
           mime_type?: string | null
+          title?: string | null
         }
         Relationships: []
       }

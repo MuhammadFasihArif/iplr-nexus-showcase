@@ -20,7 +20,12 @@ const Footer = () => {
               <Button variant="ghost" size="sm" className="p-2 hover:bg-white/10">
                 <Youtube className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="p-2 hover:bg-white/10">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="p-2 hover:bg-white/10"
+                onClick={() => window.open('https://www.instagram.com/iplr.pk?igsh=b2JjaG1wY3JmbHA0', '_blank')}
+              >
                 <Instagram className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="sm" className="p-2 hover:bg-white/10">

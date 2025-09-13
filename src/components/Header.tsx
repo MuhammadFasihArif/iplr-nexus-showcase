@@ -9,7 +9,7 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navItems = [
-    { name: "HOME", href: "#" },
+    { name: "HOME", href: "#home" },
     { name: "ARTICLES", href: "#articles" },
     { name: "RESEARCH", href: "#research" },
     { name: "VIDEOS", href: "#videos" },
@@ -77,9 +77,22 @@ const Header = () => {
                   href={item.href}
                   onClick={(e) => {
                     e.preventDefault();
-                    document.querySelector(item.href)?.scrollIntoView({
-                      behavior: 'smooth'
-                    });
+                    if (item.href === '#home') {
+                      // Scroll to top for HOME
+                      window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                      });
+                    } else {
+                      // Scroll to specific section
+                      const element = document.querySelector(item.href);
+                      if (element) {
+                        element.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start'
+                        });
+                      }
+                    }
                   }}
                   className="px-12 py-6 text-sm font-body font-semibold text-foreground uppercase tracking-[0.15em] hover:bg-muted/30 hover:text-foreground/80 transition-all duration-300 border-b-3 border-transparent hover:border-foreground relative group"
                 >
@@ -112,7 +125,26 @@ const Header = () => {
                     key={item.name}
                     href={item.href}
                     className="text-xs font-body font-medium text-foreground uppercase tracking-[0.1em] py-3 px-4 text-center hover:bg-muted/30 transition-colors duration-200"
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsMenuOpen(false);
+                      if (item.href === '#home') {
+                        // Scroll to top for HOME
+                        window.scrollTo({
+                          top: 0,
+                          behavior: 'smooth'
+                        });
+                      } else {
+                        // Scroll to specific section
+                        const element = document.querySelector(item.href);
+                        if (element) {
+                          element.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                          });
+                        }
+                      }
+                    }}
                   >
                     {item.name}
                   </a>

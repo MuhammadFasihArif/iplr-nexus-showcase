@@ -81,6 +81,7 @@ const HeroCarouselManager = () => {
   };
 
   const saveSlide = async (slideData: Partial<HeroSlide>) => {
+    setIsUploading(true);
     try {
       let imageUrl = slideData.image_url;
 
@@ -89,7 +90,7 @@ const HeroCarouselManager = () => {
         imageUrl = await uploadImage(selectedFile);
       }
 
-      if (editingSlide) {
+      if (editingSlide?.id) {
         // Update existing slide
         const { error } = await supabase
           .from('hero_slides')
@@ -102,7 +103,10 @@ const HeroCarouselManager = () => {
           })
           .eq('id', editingSlide.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw new Error(`Failed to update slide: ${error.message}`);
+        }
       } else {
         // Create new slide
         const maxOrder = Math.max(...slides.map(s => s.order_index), 0);
@@ -117,23 +121,29 @@ const HeroCarouselManager = () => {
             is_active: slideData.is_active ?? true,
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw new Error(`Failed to create slide: ${error.message}`);
+        }
       }
 
       toast({
         title: "Success",
-        description: `Slide ${editingSlide ? 'updated' : 'created'} successfully`,
+        description: `Slide ${editingSlide?.id ? 'updated' : 'created'} successfully`,
       });
 
       setEditingSlide(null);
       setSelectedFile(null);
       fetchSlides();
     } catch (error) {
+      console.error('Save slide error:', error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to save slide",
         variant: "destructive",
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -391,11 +401,12 @@ const HeroCarouselManager = () => {
             onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
+              const isActiveCheckbox = e.currentTarget.querySelector('input[name="is_active"]') as HTMLInputElement;
               saveSlide({
                 title: formData.get('title') as string,
                 subtitle: formData.get('subtitle') as string,
                 description: formData.get('description') as string,
-                is_active: formData.get('is_active') === 'on',
+                is_active: isActiveCheckbox?.checked ?? true,
               });
             }}
             className="space-y-4"
@@ -455,6 +466,7 @@ const HeroCarouselManager = () => {
                 name="is_active"
                 defaultChecked={editingSlide.is_active}
                 className="rounded"
+                value="true"
               />
               <label className="text-sm font-medium">Active</label>
             </div>

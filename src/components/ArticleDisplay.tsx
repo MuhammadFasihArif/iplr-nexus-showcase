@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Calendar, User, Clock, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, User, Clock, BookOpen, ChevronDown, ChevronUp, Download } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { downloadOriginalFile, getFileTypeIcon } from "@/lib/fileDownloader";
 
 interface Article {
   id: string;
@@ -17,6 +18,7 @@ interface Article {
   featured?: boolean;
   featured_image_url?: string;
   featured_image_alt?: string;
+  file_url?: string;
 }
 
 const ArticleDisplay = () => {
@@ -60,6 +62,7 @@ const ArticleDisplay = () => {
         featured: article.featured,
         featured_image_url: article.featured_image_url,
         featured_image_alt: article.featured_image_alt,
+        file_url: article.file_url,
       }));
 
       setArticles(transformedArticles);
@@ -82,6 +85,24 @@ const ArticleDisplay = () => {
       }
       return newSet;
     });
+  };
+
+  const handleDownload = async (article: Article) => {
+    if (!article.file_url) {
+      alert('No original file available for download');
+      return;
+    }
+
+    try {
+      // Extract filename from the file URL
+      const urlParts = article.file_url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      
+      await downloadOriginalFile(article.file_url, fileName);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download file. Please try again.');
+    }
   };
 
   useEffect(() => {
@@ -294,6 +315,17 @@ const ArticleDisplay = () => {
               {/* Article Footer */}
               <div className="mt-8 pt-6 border-t border-border/30 flex items-center justify-between">
                 <div className="flex items-center gap-4">
+                  {article.file_url && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="font-body"
+                      onClick={() => handleDownload(article)}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Download {getFileTypeIcon(article.file_url)} Original
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" className="font-body">
                     Share Article
                   </Button>

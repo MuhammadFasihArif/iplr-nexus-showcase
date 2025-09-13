@@ -147,11 +147,6 @@ const AdminAuth = () => {
               </form>
             </Form>
 
-            <div className="mt-6 pt-6 border-t border-border/30 text-center">
-              <p className="text-xs text-muted-foreground font-body">
-                Default credentials: admin / admin
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

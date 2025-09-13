@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,6 +54,24 @@ const ContactSection = () => {
                 <div>
                   <h4 className="font-body font-semibold text-foreground mb-1">Address</h4>
                   <p className="font-body text-muted-foreground">123 Academic Street<br />University District<br />City, State 12345</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="p-3 border border-border rounded-sm">
+                  <Instagram className="h-5 w-5 text-foreground" />
+                </div>
+                <div>
+                  <h4 className="font-body font-semibold text-foreground mb-1">Instagram</h4>
+                  <a 
+                    href="https://www.instagram.com/iplr.pk?igsh=b2JjaG1wY3JmbHA0" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="font-body text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  >
+                    @iplr.pk
+                  </a>
+                  <p className="font-body text-xs text-muted-foreground mt-1">Follow us for updates and insights</p>
                 </div>
               </div>
             </div>

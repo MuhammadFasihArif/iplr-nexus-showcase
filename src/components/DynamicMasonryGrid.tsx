@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { Play, FileText, BookOpen, Clock, User, ExternalLink, Star } from "lucide-react";
+import { Play, FileText, BookOpen, Clock, User, ExternalLink, Star, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadOriginalFile, getFileTypeIcon } from "@/lib/fileDownloader";
+import HoverVideoPlayer from "./HoverVideoPlayer";
 
 interface Article {
   id: string;
@@ -16,6 +18,7 @@ interface Article {
   featured?: boolean;
   featured_image_url?: string;
   featured_image_alt?: string;
+  file_url?: string;
 }
 
 interface MediaItem {
@@ -27,6 +30,7 @@ interface MediaItem {
   file_size: number;
   alt_text?: string;
   description?: string;
+  title?: string;
   external_url?: string;
   is_thumbnail?: boolean;
   created_at: string;
@@ -45,6 +49,8 @@ interface ContentItem {
   featured?: boolean;
   size: "small" | "medium" | "large" | "featured";
   external_url?: string;
+  file_url?: string;
+  file_type?: string;
 }
 
 const DynamicMasonryGrid = () => {
@@ -60,38 +66,34 @@ const DynamicMasonryGrid = () => {
     try {
       setLoading(true);
       
-      // Fetch enhanced articles (articles with featured images)
-      const { data: articles, error: articlesError } = await supabase
+      // Fetch all published articles
+      const { data: allArticles, error: articlesError } = await supabase
         .from('articles')
         .select('*')
-        .not('featured_image_url', 'is', null)
+        .eq('published', true)
         .order('created_at', { ascending: false })
-        .limit(4);
+        .limit(20);
 
-      // Fetch research articles (articles with research category)
-      const { data: research, error: researchError } = await supabase
-        .from('articles')
-        .select('*')
-        .or('category.ilike.%research%,category.ilike.%study%,category.ilike.%analysis%')
-        .is('featured_image_url', null)
-        .order('created_at', { ascending: false })
-        .limit(4);
+      // Separate articles with featured images from those without
+      const articles = allArticles?.filter(article => article.featured_image_url) || [];
+      const research = allArticles?.filter(article => 
+        !article.featured_image_url && 
+        (article.category.toLowerCase().includes('research') || 
+         article.category.toLowerCase().includes('study') || 
+         article.category.toLowerCase().includes('analysis'))
+      ) || [];
 
       if (articlesError) {
         console.error('Error fetching articles:', articlesError);
       }
 
-      if (researchError) {
-        console.error('Error fetching research:', researchError);
-      }
-
-      // Fetch video thumbnails
+      // Fetch video thumbnails and video files
       const { data: media, error: mediaError } = await supabase
         .from('media_uploads')
         .select('*')
-        .eq('file_type', 'video_thumbnail')
+        .in('file_type', ['video_thumbnail', 'video_file'])
         .order('created_at', { ascending: false })
-        .limit(4);
+        .limit(8);
 
       if (mediaError) {
         console.error('Error fetching media:', mediaError);
@@ -109,7 +111,8 @@ const DynamicMasonryGrid = () => {
         category: article.category,
         thumbnail: article.featured_image_url || "/placeholder.svg",
         featured: true,
-        size: index === 0 ? "featured" as const : index < 2 ? "large" as const : "medium" as const
+        size: index === 0 ? "featured" as const : index < 2 ? "large" as const : "medium" as const,
+        file_url: article.file_url
       }));
 
       // Transform research articles to content items
@@ -124,14 +127,15 @@ const DynamicMasonryGrid = () => {
         category: article.category,
         thumbnail: article.featured_image_url || "/placeholder.svg",
         featured: false,
-        size: index < 2 ? "medium" as const : "small" as const
+        size: index < 2 ? "medium" as const : "small" as const,
+        file_url: article.file_url
       }));
 
-      // Transform video thumbnails to content items
+      // Transform video thumbnails and video files to content items
       const videoItems: ContentItem[] = (media || []).map((item, index) => ({
         id: `video-${item.id}`,
         type: "video" as const,
-        title: item.alt_text || "Educational Video",
+        title: item.title || item.alt_text || "Educational Video",
         description: item.description || "Watch this educational content",
         author: "IPLR",
         date: new Date(item.created_at).toLocaleDateString(),
@@ -139,7 +143,8 @@ const DynamicMasonryGrid = () => {
         category: "Video",
         thumbnail: item.file_url,
         size: index < 2 ? "medium" as const : "small" as const,
-        external_url: item.external_url
+        external_url: item.external_url,
+        file_type: item.file_type
       }));
 
       // Combine all content types
@@ -184,14 +189,40 @@ const DynamicMasonryGrid = () => {
   };
 
   const handleItemClick = (item: ContentItem) => {
-    if (item.type === "video" && item.external_url) {
-      window.open(item.external_url, '_blank');
+    if (item.type === "video") {
+      if (item.file_type === "video_file") {
+        // For video files, open the video URL
+        window.open(item.thumbnail, '_blank');
+      } else if (item.external_url) {
+        // For video thumbnails, open external URL
+        window.open(item.external_url, '_blank');
+      }
     } else if (item.type === "article" || item.type === "research") {
       // Scroll to article display section
       const articleSection = document.getElementById('article-display');
       if (articleSection) {
         articleSection.scrollIntoView({ behavior: 'smooth' });
       }
+    }
+  };
+
+  const handleDownload = async (e: React.MouseEvent, article: Article) => {
+    e.stopPropagation(); // Prevent card click
+    
+    if (!article.file_url) {
+      alert('No original file available for download');
+      return;
+    }
+
+    try {
+      // Extract filename from the file URL
+      const urlParts = article.file_url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      
+      await downloadOriginalFile(article.file_url, fileName);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download file. Please try again.');
     }
   };
 
@@ -272,11 +303,20 @@ const DynamicMasonryGrid = () => {
             >
               {/* Image */}
               <div className="relative h-full overflow-hidden">
-                <img 
-                  src={item.thumbnail}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+                {item.type === "video" && item.file_type === "video_file" ? (
+                  <HoverVideoPlayer
+                    videoUrl={item.thumbnail}
+                    title={item.title}
+                    className="absolute inset-0 w-full h-full"
+                    previewDuration={5}
+                  />
+                ) : (
+                  <img 
+                    src={item.thumbnail}
+                    alt={item.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                )}
                 
                 {/* Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -326,7 +366,18 @@ const DynamicMasonryGrid = () => {
                         {item.readTime}
                       </span>
                     </div>
-                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="flex items-center gap-2">
+                      {(item.type === "article" || item.type === "research") && item.file_url && (
+                        <button
+                          onClick={(e) => handleDownload(e, item as any)}
+                          className="p-1 rounded-full bg-white/20 hover:bg-white/30 transition-colors duration-200"
+                          title="Download original file"
+                        >
+                          <Download className="h-3 w-3 text-white" />
+                        </button>
+                      )}
+                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
                   </div>
                 </div>
 

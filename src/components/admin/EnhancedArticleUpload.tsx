@@ -23,7 +23,11 @@ const articleSchema = z.object({
 
 type ArticleForm = z.infer<typeof articleSchema>;
 
-const EnhancedArticleUpload = () => {
+interface EnhancedArticleUploadProps {
+  onUploadSuccess?: () => void;
+}
+
+const EnhancedArticleUpload = ({ onUploadSuccess }: EnhancedArticleUploadProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -95,13 +99,20 @@ const EnhancedArticleUpload = () => {
 
       // Upload PDF/DOCX file if provided
       if (selectedFile) {
-        const fileName = `${Date.now()}-${selectedFile.name}`;
+        // Sanitize filename to remove special characters and spaces
+        const sanitizedFileName = selectedFile.name
+          .replace(/[^a-zA-Z0-9.-]/g, '_') // Replace special chars with underscores
+          .replace(/_{2,}/g, '_') // Replace multiple underscores with single
+          .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+        
+        const fileName = `${Date.now()}-${sanitizedFileName}`;
         const { error: uploadError } = await supabase.storage
           .from('articles')
           .upload(fileName, selectedFile);
 
         if (uploadError) {
-          throw new Error("Failed to upload file");
+          console.error('Upload error details:', uploadError);
+          throw new Error(`Failed to upload file: ${uploadError.message}`);
         }
 
         const { data: { publicUrl } } = supabase.storage
@@ -144,13 +155,20 @@ const EnhancedArticleUpload = () => {
 
       // Upload featured image if provided
       if (selectedImage) {
-        const fileName = `${Date.now()}-featured-${selectedImage.name}`;
+        // Sanitize filename to remove special characters and spaces
+        const sanitizedImageName = selectedImage.name
+          .replace(/[^a-zA-Z0-9.-]/g, '_') // Replace special chars with underscores
+          .replace(/_{2,}/g, '_') // Replace multiple underscores with single
+          .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+        
+        const fileName = `${Date.now()}-featured-${sanitizedImageName}`;
         const { error: imageUploadError } = await supabase.storage
           .from('media')
           .upload(fileName, selectedImage);
 
         if (imageUploadError) {
-          throw new Error("Failed to upload featured image");
+          console.error('Image upload error details:', imageUploadError);
+          throw new Error(`Failed to upload featured image: ${imageUploadError.message}`);
         }
 
         const { data: { publicUrl } } = supabase.storage
@@ -162,28 +180,40 @@ const EnhancedArticleUpload = () => {
       }
 
       // Save article to database
+      const articleData: any = {
+        title: data.title,
+        author: data.author,
+        category: data.category,
+        content: extractedContent,
+        featured: data.featured,
+        published: data.published,
+        file_url: fileUrl,
+      };
+
+      // Add featured image fields if they exist
+      if (featuredImageUrl) {
+        articleData.featured_image_url = featuredImageUrl;
+        articleData.featured_image_alt = featuredImageAlt;
+      }
+
       const { error } = await supabase
         .from('articles')
-        .insert({
-          title: data.title,
-          author: data.author,
-          category: data.category,
-          content: extractedContent,
-          featured: data.featured,
-          published: data.published,
-          file_url: fileUrl,
-          featured_image_url: featuredImageUrl,
-          featured_image_alt: featuredImageAlt,
-        });
+        .insert(articleData);
 
       if (error) {
-        throw new Error("Failed to save article");
+        console.error('Database insert error:', error);
+        throw new Error(`Failed to save article: ${error.message}`);
       }
 
       toast({
         title: "Article Created",
         description: "Article has been successfully created",
       });
+
+      // Call the success callback to refresh dashboard metrics
+      if (onUploadSuccess) {
+        onUploadSuccess();
+      }
 
       // Reset form
       form.reset();

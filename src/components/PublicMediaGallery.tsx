@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Image, Video, ExternalLink, Eye } from "lucide-react";
+import HoverVideoPlayer from "./HoverVideoPlayer";
 
 interface MediaItem {
   id: string;
@@ -14,9 +15,10 @@ interface MediaItem {
   file_size: number;
   alt_text: string;
   description: string | null;
+  title: string | null;
+  is_thumbnail?: boolean;
   created_at: string;
   external_url?: string;
-  is_thumbnail?: boolean;
 }
 
 const PublicMediaGallery = () => {
@@ -102,6 +104,13 @@ const PublicMediaGallery = () => {
                     src={item.file_url}
                     alt={item.alt_text}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : item.file_type === 'video_file' ? (
+                  <HoverVideoPlayer
+                    videoUrl={item.file_url}
+                    title={item.title || item.alt_text}
+                    className="w-full h-full"
+                    previewDuration={5}
                   />
                 ) : item.file_type === 'video_thumbnail' ? (
                   <div className="relative w-full h-full">
@@ -212,6 +221,15 @@ const PublicMediaGallery = () => {
                       alt={selectedItem.alt_text}
                       className="w-full rounded-lg"
                     />
+                  ) : selectedItem.file_type === 'video_file' ? (
+                    <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                      <HoverVideoPlayer
+                        videoUrl={selectedItem.file_url}
+                        title={selectedItem.title || selectedItem.alt_text}
+                        className="w-full h-full"
+                        previewDuration={5}
+                      />
+                    </div>
                   ) : selectedItem.file_type === 'video_thumbnail' ? (
                     <div className="relative">
                       <img
@@ -251,7 +269,7 @@ const PublicMediaGallery = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Title</label>
-                    <p className="text-sm">{selectedItem.alt_text}</p>
+                    <p className="text-sm">{selectedItem.title || selectedItem.alt_text}</p>
                   </div>
 
                   {selectedItem.description && (
@@ -265,6 +283,7 @@ const PublicMediaGallery = () => {
                     <label className="text-sm font-medium text-muted-foreground">Type</label>
                     <p className="text-sm">
                       {selectedItem.file_type === 'image' ? 'Image' : 
+                       selectedItem.file_type === 'video_file' ? 'Video File' :
                        selectedItem.file_type === 'video_thumbnail' ? 'Video Thumbnail' : 'Video Link'}
                     </p>
                   </div>
@@ -283,6 +302,19 @@ const PublicMediaGallery = () => {
                       >
                         <ExternalLink className="h-4 w-4 mr-2" />
                         Watch Video
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {selectedItem.file_type === 'video_file' && (
+                    <div>
+                      <Button
+                        variant="default"
+                        className="w-full"
+                        onClick={() => window.open(selectedItem.file_url, '_blank')}
+                      >
+                        <Video className="h-4 w-4 mr-2" />
+                        Open Video
                       </Button>
                     </div>
                   )}

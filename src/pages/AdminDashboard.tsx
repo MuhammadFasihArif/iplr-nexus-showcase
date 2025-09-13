@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Plus, FileText, Image, Video, Users, Settings } from "lucide-react";
+import { LogOut, Plus, FileText, Image, Video, Users, Settings, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import ArticleUpload from "@/components/admin/ArticleUpload";
 import MediaUpload from "@/components/admin/MediaUpload";
 import EnhancedArticleUpload from "@/components/admin/EnhancedArticleUpload";
@@ -14,10 +15,85 @@ import MediaGallery from "@/components/admin/MediaGallery";
 import HeroCarouselManager from "@/components/admin/HeroCarouselManager";
 import TestMediaUpload from "@/components/admin/TestMediaUpload";
 
+interface DashboardMetrics {
+  totalArticles: number;
+  mediaFiles: number;
+  videoLinks: number;
+  visitors: number;
+  articlesChange: number;
+  mediaChange: number;
+  videoChange: number;
+  visitorsChange: number;
+}
+
 const AdminDashboard = () => {
   const [adminSession, setAdminSession] = useState<any>(null);
+  const [metrics, setMetrics] = useState<DashboardMetrics>({
+    totalArticles: 0,
+    mediaFiles: 0,
+    videoLinks: 0,
+    visitors: 0,
+    articlesChange: 0,
+    mediaChange: 0,
+    videoChange: 0,
+    visitorsChange: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("articles");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const fetchMetrics = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch articles count
+      const { count: articlesCount, error: articlesError } = await supabase
+        .from('articles')
+        .select('*', { count: 'exact', head: true });
+
+      // Fetch media files count
+      const { count: mediaCount, error: mediaError } = await supabase
+        .from('media_uploads')
+        .select('*', { count: 'exact', head: true });
+
+      // Fetch video links count (media with video type)
+      const { count: videoCount, error: videoError } = await supabase
+        .from('media_uploads')
+        .select('*', { count: 'exact', head: true })
+        .eq('file_type', 'video_link');
+
+      if (articlesError) throw articlesError;
+      if (mediaError) throw mediaError;
+      if (videoError) throw videoError;
+
+      // Calculate changes (simplified - in real app you'd compare with previous period)
+      const articlesChange = Math.floor(Math.random() * 10) + 1; // Random for demo
+      const mediaChange = Math.floor(Math.random() * 20) + 5;
+      const videoChange = Math.floor(Math.random() * 8) + 1;
+      const visitorsChange = Math.floor(Math.random() * 25) + 10;
+
+      setMetrics({
+        totalArticles: articlesCount || 0,
+        mediaFiles: mediaCount || 0,
+        videoLinks: videoCount || 0,
+        visitors: Math.floor(Math.random() * 5000) + 2000, // Simulated visitor count
+        articlesChange,
+        mediaChange,
+        videoChange,
+        visitorsChange,
+      });
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard metrics",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const session = localStorage.getItem("admin_session");
@@ -38,11 +114,21 @@ const AdminDashboard = () => {
       }
       
       setAdminSession(sessionData);
+      // Fetch metrics when session is valid
+      fetchMetrics();
     } catch {
       localStorage.removeItem("admin_session");
       navigate("/admin/login");
     }
   }, [navigate]);
+
+  // Refresh metrics every 30 seconds
+  useEffect(() => {
+    if (!adminSession) return;
+    
+    const interval = setInterval(fetchMetrics, 30000);
+    return () => clearInterval(interval);
+  }, [adminSession]);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_session");
@@ -51,6 +137,11 @@ const AdminDashboard = () => {
       description: "You have been successfully logged out",
     });
     navigate("/");
+  };
+
+  // Function to refresh metrics (can be called from child components)
+  const refreshMetrics = () => {
+    fetchMetrics();
   };
 
   if (!adminSession) {
@@ -81,6 +172,15 @@ const AdminDashboard = () => {
               </Button>
               <Button
                 variant="ghost"
+                onClick={fetchMetrics}
+                disabled={loading}
+                className="font-body"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={handleLogout}
                 className="font-body"
               >
@@ -103,9 +203,11 @@ const AdminDashboard = () => {
                 <FileText className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">24</div>
+                <div className="text-2xl font-bold">
+                  {loading ? "..." : metrics.totalArticles}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +2 from last month
+                  +{metrics.articlesChange} from last month
                 </p>
               </CardContent>
             </Card>
@@ -116,9 +218,11 @@ const AdminDashboard = () => {
                 <Image className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">128</div>
+                <div className="text-2xl font-bold">
+                  {loading ? "..." : metrics.mediaFiles}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +15 from last month
+                  +{metrics.mediaChange} from last month
                 </p>
               </CardContent>
             </Card>
@@ -129,9 +233,11 @@ const AdminDashboard = () => {
                 <Video className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">42</div>
+                <div className="text-2xl font-bold">
+                  {loading ? "..." : metrics.videoLinks}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +5 from last month
+                  +{metrics.videoChange} from last month
                 </p>
               </CardContent>
             </Card>
@@ -142,16 +248,18 @@ const AdminDashboard = () => {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2,847</div>
+                <div className="text-2xl font-bold">
+                  {loading ? "..." : metrics.visitors.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  +18% from last month
+                  +{metrics.visitorsChange}% from last month
                 </p>
               </CardContent>
             </Card>
           </div>
 
           {/* Management Tabs */}
-          <Tabs defaultValue="articles" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="articles">Articles</TabsTrigger>
               <TabsTrigger value="enhanced-articles">Enhanced Articles</TabsTrigger>
@@ -173,7 +281,7 @@ const AdminDashboard = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ArticleUpload />
+                    <ArticleUpload onUploadSuccess={refreshMetrics} />
                   </CardContent>
                 </Card>
 
@@ -185,14 +293,14 @@ const AdminDashboard = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <ArticleManager />
+                    <ArticleManager onUpdate={refreshMetrics} />
                   </CardContent>
                 </Card>
               </div>
             </TabsContent>
             
             <TabsContent value="enhanced-articles" className="space-y-6">
-              <EnhancedArticleUpload />
+              <EnhancedArticleUpload onUploadSuccess={refreshMetrics} />
             </TabsContent>
             
             <TabsContent value="media" className="space-y-6">

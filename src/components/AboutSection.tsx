@@ -8,7 +8,7 @@ const AboutSection = () => {
           </h2>
           <div className="w-24 h-px bg-foreground mx-auto mb-8"></div>
           <p className="text-lg font-body text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            The Institute for Professional Learning & Research is dedicated to advancing education 
+            The Institute of Policy and Law Reforms is dedicated to advancing education 
             through innovative research, publications, and professional development programs.
           </p>
         </div>
