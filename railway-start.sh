@@ -2,6 +2,11 @@
 
 echo "🚀 Starting Railway deployment process..."
 
+# Check Node.js and npm versions
+echo "🔍 Checking environment..."
+node --version
+npm --version
+
 # Create test directory for pdf-parse workaround
 echo "📁 Creating test directory for pdf-parse workaround..."
 mkdir -p test/data
