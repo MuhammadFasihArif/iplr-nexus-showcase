@@ -183,4 +183,68 @@ All colors MUST be HSL.
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Mobile-specific utilities */
+  .mobile-text-sm {
+    @apply text-xs sm:text-sm;
+  }
+
+  .mobile-text-base {
+    @apply text-sm sm:text-base;
+  }
+
+  .mobile-text-lg {
+    @apply text-base sm:text-lg;
+  }
+
+  .mobile-text-xl {
+    @apply text-lg sm:text-xl;
+  }
+
+  .mobile-text-2xl {
+    @apply text-xl sm:text-2xl;
+  }
+
+  .mobile-text-3xl {
+    @apply text-2xl sm:text-3xl;
+  }
+
+  .mobile-padding {
+    @apply px-4 sm:px-6;
+  }
+
+  .mobile-margin {
+    @apply mx-4 sm:mx-6;
+  }
+
+  .mobile-gap {
+    @apply gap-2 sm:gap-4;
+  }
+
+  .mobile-gap-lg {
+    @apply gap-4 sm:gap-6;
+  }
+
+  /* Mobile-friendly touch targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Mobile-optimized spacing */
+  .mobile-space-y {
+    @apply space-y-4 sm:space-y-6;
+  }
+
+  .mobile-space-y-lg {
+    @apply space-y-6 sm:space-y-8;
+  }
+
+  /* Mobile typography improvements */
+  .mobile-prose {
+    @apply text-sm sm:text-base leading-relaxed;
+  }
+
+  .mobile-prose-lg {
+    @apply text-base sm:text-lg leading-relaxed;
+  }
 }

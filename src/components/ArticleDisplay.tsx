@@ -194,87 +194,87 @@ const ArticleDisplay = () => {
   ];
 
   return (
-    <section id="article-display" className="py-16 px-6 bg-background">
+    <section id="article-display" className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 bg-background">
       <div className="container mx-auto max-w-4xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-academic font-bold text-foreground mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl font-academic font-bold text-foreground mb-3 sm:mb-4">
             Enhanced Articles
           </h2>
-          <p className="font-body text-muted-foreground max-w-2xl mx-auto">
+          <p className="font-body text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base px-4">
             In-depth articles with rich content, images, and insights in professional learning and development
           </p>
         </div>
 
         {isLoading ? (
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="p-8 border border-border/50 animate-pulse">
-                <div className="space-y-4">
-                  <div className="h-4 bg-muted rounded w-1/4"></div>
-                  <div className="h-6 bg-muted rounded w-3/4"></div>
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
+              <Card key={i} className="p-4 sm:p-6 lg:p-8 border border-border/50 animate-pulse">
+                <div className="space-y-3 sm:space-y-4">
+                  <div className="h-3 sm:h-4 bg-muted rounded w-1/4"></div>
+                  <div className="h-5 sm:h-6 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 sm:h-4 bg-muted rounded w-1/2"></div>
                   <div className="space-y-2">
-                    <div className="h-4 bg-muted rounded"></div>
-                    <div className="h-4 bg-muted rounded w-5/6"></div>
-                    <div className="h-4 bg-muted rounded w-4/5"></div>
+                    <div className="h-3 sm:h-4 bg-muted rounded"></div>
+                    <div className="h-3 sm:h-4 bg-muted rounded w-5/6"></div>
+                    <div className="h-3 sm:h-4 bg-muted rounded w-4/5"></div>
                   </div>
                 </div>
               </Card>
             ))}
           </div>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {articles.map((article) => (
             <Card 
               key={article.id} 
-              className="p-8 border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300 bg-card"
+              className="p-4 sm:p-6 lg:p-8 border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300 bg-card"
             >
               {/* Featured Image */}
               {article.featured_image_url && (
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                   <img
                     src={article.featured_image_url}
                     alt={article.featured_image_alt || article.title}
-                    className="w-full h-64 object-cover rounded-lg"
+                    className="w-full h-48 sm:h-56 lg:h-64 object-cover rounded-lg"
                   />
                 </div>
               )}
 
               {/* Article Header */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="mb-4 sm:mb-6">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <Badge 
                     variant="secondary" 
-                    className="font-body text-xs"
+                    className="font-body text-[10px] sm:text-xs"
                   >
-                    <BookOpen className="h-3 w-3 mr-1" />
+                    <BookOpen className="h-2 w-2 sm:h-3 sm:w-3 mr-1" />
                     {article.category}
                   </Badge>
                   {article.featured && (
                     <Badge 
                       variant="default" 
-                      className="font-body text-xs bg-accent text-accent-foreground"
+                      className="font-body text-[10px] sm:text-xs bg-accent text-accent-foreground"
                     >
                       Featured
                     </Badge>
                   )}
                 </div>
                 
-                <h3 className="text-2xl font-academic font-bold text-foreground mb-4 leading-tight">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-academic font-bold text-foreground mb-3 sm:mb-4 leading-tight">
                   {article.title}
                 </h3>
                 
-                <div className="flex items-center gap-6 text-sm text-muted-foreground font-body">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>{article.author}</span>
+                <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground font-body">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="truncate">{article.author}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>{article.date}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>{article.readTime}</span>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ const ArticleDisplay = () => {
                     return (
                       <div>
                         {paragraphs.map((paragraph, index) => (
-                          <p key={index} className="font-body text-foreground/90 leading-relaxed mb-4 text-justify">
+                          <p key={index} className="font-body text-foreground/90 leading-relaxed mb-3 sm:mb-4 text-justify text-sm sm:text-base">
                             {paragraph.trim()}
                           </p>
                         ))}
@@ -301,7 +301,7 @@ const ArticleDisplay = () => {
                     // Show preview
                     const previewParagraph = paragraphs[0] || article.content.substring(0, 500);
                     return (
-                      <p className="font-body text-foreground/90 leading-relaxed mb-4 text-justify">
+                      <p className="font-body text-foreground/90 leading-relaxed mb-3 sm:mb-4 text-justify text-sm sm:text-base">
                         {previewParagraph.length > 500 
                           ? previewParagraph.substring(0, 500) + '...'
                           : previewParagraph
@@ -313,44 +313,49 @@ const ArticleDisplay = () => {
               </div>
 
               {/* Article Footer */}
-              <div className="mt-8 pt-6 border-t border-border/30 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  {article.file_url && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="font-body"
-                      onClick={() => handleDownload(article)}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download {getFileTypeIcon(article.file_url)} Original
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border/30">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                    {article.file_url && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="font-body text-xs sm:text-sm"
+                        onClick={() => handleDownload(article)}
+                      >
+                        <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        <span className="hidden sm:inline">Download {getFileTypeIcon(article.file_url)} Original</span>
+                        <span className="sm:hidden">Download</span>
+                      </Button>
+                    )}
+                    <Button variant="outline" size="sm" className="font-body text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Share Article</span>
+                      <span className="sm:hidden">Share</span>
                     </Button>
-                  )}
-                  <Button variant="outline" size="sm" className="font-body">
-                    Share Article
-                  </Button>
-                  <Button variant="ghost" size="sm" className="font-body text-muted-foreground">
-                    Save for Later
+                    <Button variant="ghost" size="sm" className="font-body text-muted-foreground text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Save for Later</span>
+                      <span className="sm:hidden">Save</span>
+                    </Button>
+                  </div>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="font-body bg-foreground text-background hover:bg-foreground/90 text-xs sm:text-sm w-full sm:w-auto"
+                    onClick={() => toggleArticleExpansion(article.id)}
+                  >
+                    {expandedArticles.has(article.id) ? (
+                      <>
+                        <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        Read Less
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                        Read More
+                      </>
+                    )}
                   </Button>
                 </div>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="font-body bg-foreground text-background hover:bg-foreground/90"
-                  onClick={() => toggleArticleExpansion(article.id)}
-                >
-                  {expandedArticles.has(article.id) ? (
-                    <>
-                      <ChevronUp className="h-4 w-4 mr-1" />
-                      Read Less
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-4 w-4 mr-1" />
-                      Read More
-                    </>
-                  )}
-                </Button>
               </div>
             </Card>
             ))}
@@ -358,10 +363,10 @@ const ArticleDisplay = () => {
         )}
 
         {/* Load More Articles */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-8 sm:mt-12">
           <Button 
             variant="outline" 
-            className="rounded-none border-2 border-foreground text-foreground hover:bg-foreground hover:text-background font-body font-medium px-8 py-3 uppercase tracking-[0.1em] text-xs transition-all duration-300"
+            className="rounded-none border-2 border-foreground text-foreground hover:bg-foreground hover:text-background font-body font-medium px-6 sm:px-8 py-2 sm:py-3 uppercase tracking-[0.1em] text-xs transition-all duration-300"
           >
             Load More Articles
           </Button>

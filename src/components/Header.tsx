@@ -20,14 +20,14 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-background border-b border-border">
       {/* Top Bar with Logo and Search */}
-      <div className="container mx-auto px-6 py-6">
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div className="flex items-center justify-between relative">
           {/* Logo - Newspaper Style */}
           <div className="text-center flex-1">
-            <h1 className="text-5xl md:text-6xl font-academic font-bold tracking-wide mb-2" style={{ color: 'hsl(var(--logo-teal))' }}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-academic font-bold tracking-wide mb-1 sm:mb-2" style={{ color: 'hsl(var(--logo-teal))' }}>
               IPLR
             </h1>
-            <p className="text-xs font-body text-muted-foreground uppercase tracking-[0.2em] border-t border-b border-border py-1">
+            <p className="text-[10px] sm:text-xs font-body text-muted-foreground uppercase tracking-[0.15em] sm:tracking-[0.2em] border-t border-b border-border py-1 px-2 sm:px-0">
               INSTITUTE OF POLICY AND LAW REFORMS
             </p>
           </div>
@@ -37,7 +37,7 @@ const Header = () => {
             variant="ghost"
             size="sm"
             onClick={() => window.location.href = '/admin/login'}
-            className="p-2 absolute right-16 top-6 text-xs"
+            className="p-1 sm:p-2 absolute right-12 sm:right-16 top-2 sm:top-6 text-[10px] sm:text-xs"
           >
             Admin
           </Button>
@@ -47,19 +47,19 @@ const Header = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="p-2 absolute right-6 top-6"
+            className="p-1 sm:p-2 absolute right-2 sm:right-6 top-2 sm:top-6"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </div>
 
         {/* Search Bar */}
         {isSearchOpen && (
-          <div className="mt-6 animate-fade-in">
+          <div className="mt-4 sm:mt-6 animate-fade-in">
             <Input
               type="text"
               placeholder="Search articles, research, and videos..."
-              className="w-full max-w-md mx-auto border-t-0 border-l-0 border-r-0 rounded-none focus:ring-0 bg-transparent"
+              className="w-full max-w-md mx-auto border-t-0 border-l-0 border-r-0 rounded-none focus:ring-0 bg-transparent text-sm sm:text-base"
             />
           </div>
         )}
@@ -67,7 +67,7 @@ const Header = () => {
 
       {/* Navigation Tabs - Paper Magazine Style */}
       <div className="border-t-2 border-border bg-background shadow-sm">
-        <div className="w-full px-8">
+        <div className="w-full px-4 sm:px-8">
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-center">
             <nav className="flex items-center justify-center flex-1 max-w-6xl mx-auto">
@@ -94,7 +94,7 @@ const Header = () => {
                       }
                     }
                   }}
-                  className="px-6 py-6 text-sm font-body font-semibold text-foreground uppercase tracking-[0.15em] hover:bg-muted/30 hover:text-foreground/80 transition-all duration-300 border-b-3 border-transparent hover:border-foreground relative group whitespace-nowrap"
+                  className="px-4 lg:px-6 py-4 lg:py-6 text-xs lg:text-sm font-body font-semibold text-foreground uppercase tracking-[0.1em] lg:tracking-[0.15em] hover:bg-muted/30 hover:text-foreground/80 transition-all duration-300 border-b-3 border-transparent hover:border-foreground relative group whitespace-nowrap"
                 >
                   {item.name}
                   <span className="absolute inset-x-0 bottom-0 h-0.5 bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
@@ -104,27 +104,27 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center justify-between py-4">
-            <span className="text-xs font-body uppercase tracking-[0.1em]">Menu</span>
+          <div className="md:hidden flex items-center justify-between py-3 sm:py-4">
+            <span className="text-[10px] sm:text-xs font-body uppercase tracking-[0.1em]">Menu</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2"
+              className="p-1 sm:p-2"
             >
-              {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              {isMenuOpen ? <X className="h-3 w-3 sm:h-4 sm:w-4" /> : <Menu className="h-3 w-3 sm:h-4 sm:w-4" />}
             </Button>
           </div>
 
           {/* Mobile Navigation */}
           {isMenuOpen && (
             <div className="md:hidden pb-4 border-t border-border pt-4 animate-fade-in">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-1 sm:gap-2">
                 {navItems.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-xs font-body font-medium text-foreground uppercase tracking-[0.1em] py-3 px-2 text-center hover:bg-muted/30 transition-colors duration-200 whitespace-nowrap"
+                    className="text-[10px] sm:text-xs font-body font-medium text-foreground uppercase tracking-[0.05em] sm:tracking-[0.1em] py-2 sm:py-3 px-1 sm:px-2 text-center hover:bg-muted/30 transition-colors duration-200 whitespace-nowrap"
                     onClick={(e) => {
                       e.preventDefault();
                       setIsMenuOpen(false);
