@@ -61,7 +61,7 @@ const Footer = () => {
             <h4 className="font-academic font-semibold mb-4">Research Areas</h4>
             <nav className="flex flex-col space-y-3">
               {[
-                "Legal Research",
+                "Environmental Law",
                 "Policy Analysis", 
                 "Constitutional Law",
                 "Administrative Law",

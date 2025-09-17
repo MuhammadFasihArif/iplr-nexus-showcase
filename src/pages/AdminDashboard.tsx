@@ -14,6 +14,7 @@ import ArticleManager from "@/components/admin/ArticleManager";
 import MediaGallery from "@/components/admin/MediaGallery";
 import HeroCarouselManager from "@/components/admin/HeroCarouselManager";
 import TestMediaUpload from "@/components/admin/TestMediaUpload";
+import PasswordChange from "@/components/admin/PasswordChange";
 
 interface DashboardMetrics {
   totalArticles: number;
@@ -367,22 +368,26 @@ const AdminDashboard = () => {
             </TabsContent>
             
             <TabsContent value="settings" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Site Settings
-                  </CardTitle>
-                  <CardDescription>
-                    Configure website settings and preferences
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    Site settings coming soon
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <PasswordChange />
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Site Settings
+                    </CardTitle>
+                    <CardDescription>
+                      Configure website settings and preferences
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8 text-muted-foreground">
+                      Site settings coming soon
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
